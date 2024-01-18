@@ -1,7 +1,6 @@
 package fenixConnectorAdminShared
 
 import (
-	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/sirupsen/logrus"
@@ -9,19 +8,20 @@ import (
 	"time"
 )
 
-func InitiateFenixConnectorAdminShared(connectorFunctionsToDoCallBackOn *common_config.ConnectorCallBackFunctionsStruct) {
+func InitiateFenixConnectorAdminShared(
+	connectorFunctionsToDoCallBackOn *common_config.ConnectorCallBackFunctionsStruct) {
 
 	// Store references to call-back functions
 	common_config.ConnectorFunctionsToDoCallBackOn = connectorFunctionsToDoCallBackOn
-
-	myTime, _ := common_config.ConnectorFunctionsToDoCallBackOn.GetMaxExpectedFinishedTimeStamp()
-	fmt.Println(myTime)
 
 	// Run 'init()'
 	fenixConnectorAdminSharedInit()
 
 	// Initiate logger in common_config
 	InitLogger("")
+
+	// Initiate Logger via Call-back
+	common_config.ConnectorFunctionsToDoCallBackOn.InitiateLogger(common_config.Logger)
 
 	// When Execution Worker runs on GCP, then set up access
 	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP &&

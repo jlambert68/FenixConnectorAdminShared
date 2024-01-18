@@ -2,6 +2,7 @@ package common_config
 
 import (
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -17,6 +18,11 @@ type ConnectorCallBackFunctionsStruct struct {
 	ProcessTestInstructionExecutionRequest func(
 		testInstructionExecutionPubSubRequest *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest) (
 		testInstructionExecutionResultMessage *fenixExecutionWorkerGrpcApi.FinalTestInstructionExecutionResultMessage,
+		err error)
+
+	// Initiate callers logger
+	InitiateLogger func(
+		logger *logrus.Logger) (
 		err error)
 }
 

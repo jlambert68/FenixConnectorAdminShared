@@ -22,4 +22,4 @@ type ConnectorCallBackFunctionsStruct struct {
 
 // ConnectorFunctionsToDoCallBackOn
 // Variable that stores the functions that can be call via call-back
-var ConnectorFunctionsToDoCallBackOn ConnectorCallBackFunctionsStruct
+var ConnectorFunctionsToDoCallBackOn *ConnectorCallBackFunctionsStruct

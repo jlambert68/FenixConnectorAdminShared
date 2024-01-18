@@ -8,7 +8,10 @@ import (
 	"time"
 )
 
-func InitiateFenixConnectorAdminShared() {
+func InitiateFenixConnectorAdminShared(connectorFunctionsToDoCallBackOn *common_config.ConnectorCallBackFunctionsStruct) {
+
+	// Store references to call-back functions
+	common_config.ConnectorFunctionsToDoCallBackOn = connectorFunctionsToDoCallBackOn
 
 	// Run 'init()'
 	fenixConnectorAdminSharedInit()

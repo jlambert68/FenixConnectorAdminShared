@@ -1,7 +1,7 @@
 package messagesToExecutionWorkerServer
 
 import (
-	"FenixSCConnector/gcp"
+	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

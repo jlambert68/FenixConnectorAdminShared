@@ -1,7 +1,7 @@
-package main
+package fenixConnectorAdminShared
 
 import (
-	"FenixSCConnector/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/sirupsen/logrus"
 	"strconv"
 	//"flag"
@@ -142,7 +142,7 @@ func dumpMap(space string, m map[string]interface{}) {
 	}
 }
 
-func init() {
+func fenixConnectorAdminSharedInit() {
 	//executionLocationForConnector := flag.String("startupType", "0", "The application should be started with one of the following: LOCALHOST_NODOCKER, LOCALHOST_DOCKER, GCP")
 	//flag.Parse()
 
@@ -233,18 +233,6 @@ func init() {
 	}
 	common_config.GCPAuthentication = boolValue
 
-	// Extract if local web server for test should be used instead of FangEngine
-	boolValue, err = strconv.ParseBool(mustGetenv("UseInternalWebServerForTest"))
-	if err != nil {
-		fmt.Println("Couldn't convert environment variable 'UseInternalWebServerForTest:' to an boolean, error: ", err)
-		os.Exit(0)
-	}
-	common_config.UseInternalWebServerForTest = boolValue
-
-	// Extract Address, Port and url-path for Sub Custody Rest-Engine
-	common_config.CAEngineAddress = mustGetenv("CAEngineAddress")
-	common_config.CAEngineAddressPath = mustGetenv("CAEngineAddressPath")
-
 	// Extract if Service Account should be used towards GCP or should the user log in via web
 	boolValue, err = strconv.ParseBool(mustGetenv("UseServiceAccount"))
 	if err != nil {
@@ -252,14 +240,6 @@ func init() {
 		os.Exit(0)
 	}
 	common_config.UseServiceAccount = boolValue
-
-	// Extract if there should be calls to ExecutionWorker or not. Used when testing Connector
-	boolValue, err = strconv.ParseBool(mustGetenv("TurnOffCallToWorker"))
-	if err != nil {
-		fmt.Println("Couldn't convert environment variable 'TurnOffCallToWorker:' to an boolean, error: ", err)
-		os.Exit(0)
-	}
-	common_config.TurnOffCallToWorker = boolValue
 
 	// Extract OAuth 2.0 Client ID
 	common_config.AuthClientId = mustGetenv("AuthClientId")

@@ -1,15 +1,14 @@
 package incomingPubSubMessages
 
 import (
-	"FenixSCConnector/common_config"
-	"FenixSCConnector/connectorEngine"
-	"FenixSCConnector/messagesToExecutionWorkerServer"
-	"FenixSCConnector/restCallsToCAEngine"
 	"errors"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
+	"time"
 )
 
 func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
@@ -45,102 +44,85 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 		return err
 	}
 
-	// Convert into Message used by converter which is the message from reversed request service
-	var processTestInstructionExecutionReveredRequest *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionReveredRequest
-	processTestInstructionExecutionReveredRequest = &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionReveredRequest{
-		ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.CurrentFenixExecutionWorkerProtoFileVersionEnum(
-			processTestInstructionExecutionPubSubRequest.GetProtoFileVersionUsedByClient()),
-		TestInstruction: &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionReveredRequest_TestInstructionExecutionMessage{
-			TestInstructionExecutionUuid: processTestInstructionExecutionPubSubRequest.TestInstruction.GetTestInstructionExecutionUuid(),
-			TestInstructionUuid:          processTestInstructionExecutionPubSubRequest.TestInstruction.GetTestInstructionUuid(),
-			TestInstructionName:          processTestInstructionExecutionPubSubRequest.TestInstruction.GetTestInstructionName(),
-			MajorVersionNumber:           processTestInstructionExecutionPubSubRequest.TestInstruction.GetMajorVersionNumber(),
-			MinorVersionNumber:           processTestInstructionExecutionPubSubRequest.TestInstruction.GetMinorVersionNumber(),
-			TestInstructionAttributes:    nil, // Converted below
-		},
-		TestData: &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionReveredRequest_TestDataMessage{
-			TestDataSetUuid:           processTestInstructionExecutionPubSubRequest.TestData.GetTestDataSetUuid(),
-			ManualOverrideForTestData: nil, // Converted below
-		},
-	}
+	var couldSend bool
+	var returnMessage string
 
-	// Convert 'TestInstruction:TestInstructionAttributes'
-	var tempTestInstructionAttributes []*fenixExecutionWorkerGrpcApi.
-		ProcessTestInstructionExecutionReveredRequest_TestInstructionAttributeMessage
+	// Gets the max time for when the TestInstructionExecution can be seen as "dead", by doing callback to code in Connector
+	var maxExpectedFinishedTimeStamp time.Time
+	var processTestInstructionExecutionResponse *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionResponse
+	maxExpectedFinishedTimeStamp, err = common_config.ConnectorFunctionsToDoCallBackOn.GetMaxExpectedFinishedTimeStamp()
 
-	// Loop 'TestInstructionAttributes' from PubSub-message
-	for _, pubSubTestInstructionAttribute := range processTestInstructionExecutionPubSubRequest.TestInstruction.TestInstructionAttributes {
-		var tempTestInstructionAttribute *fenixExecutionWorkerGrpcApi.
-			ProcessTestInstructionExecutionReveredRequest_TestInstructionAttributeMessage
-		tempTestInstructionAttribute = &fenixExecutionWorkerGrpcApi.
-			ProcessTestInstructionExecutionReveredRequest_TestInstructionAttributeMessage{
-			TestInstructionAttributeType: fenixExecutionWorkerGrpcApi.TestInstructionAttributeTypeEnum(
-				pubSubTestInstructionAttribute.GetTestInstructionAttributeType()),
-			TestInstructionAttributeUuid:     pubSubTestInstructionAttribute.GetTestInstructionAttributeUuid(),
-			TestInstructionAttributeName:     pubSubTestInstructionAttribute.GetTestInstructionAttributeName(),
-			AttributeValueAsString:           pubSubTestInstructionAttribute.GetAttributeValueAsString(),
-			AttributeValueUuid:               pubSubTestInstructionAttribute.GetTestInstructionAttributeUuid(),
-			TestInstructionAttributeTypeUuid: pubSubTestInstructionAttribute.GetTestInstructionAttributeTypeUuid(),
-			TestInstructionAttributeTypeName: pubSubTestInstructionAttribute.GetTestInstructionAttributeTypeName(),
+	// Response from GetMaxExpectedFinishedTimeStamp-call
+	if err != nil {
+
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "8b177a17-efe9-4041-89a9-bd9b424509d9",
+			"err": err.Error(),
+		}).Error("Couldn't get a ExpectedFinishTimeStamp")
+
+		// Couldn't get a ExpectedFinishTimeStamp
+		timeAtDurationEnd := time.Now()
+
+		// Generate response message to Worker, that conversion didn't work out
+		processTestInstructionExecutionResponse = &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionResponse{
+			AckNackResponse: &fenixExecutionWorkerGrpcApi.AckNackResponse{
+				AckNack:                      false,
+				Comments:                     err.Error(),
+				ErrorCodes:                   nil,
+				ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.CurrentFenixExecutionWorkerProtoFileVersionEnum(common_config.GetHighestExecutionWorkerProtoFileVersion()),
+			},
+			TestInstructionExecutionUuid:   processTestInstructionExecutionPubSubRequest.TestInstruction.TestInstructionExecutionUuid,
+			ExpectedExecutionDuration:      timestamppb.New(timeAtDurationEnd),
+			TestInstructionCanBeReExecuted: true,
 		}
 
-		// Append to slice of 'TestInstructionAttributes'
-		tempTestInstructionAttributes = append(tempTestInstructionAttributes, tempTestInstructionAttribute)
-	}
+	} else {
 
-	processTestInstructionExecutionReveredRequest.TestInstruction.TestInstructionAttributes = tempTestInstructionAttributes
-
-	// Convert 'TestData:ManualOverrideForTestData'
-	var tempManualOverrideForTestDataSlice []*fenixExecutionWorkerGrpcApi.
-		ProcessTestInstructionExecutionReveredRequest_TestDataMessage_ManualOverrideForTestDataMessage
-
-	// Loop 'TestInstructionAttributes' from PubSub-message
-	for _, pubSubManualOverrideForTestData := range processTestInstructionExecutionPubSubRequest.TestData.ManualOverrideForTestData {
-		var tempManualOverrideForTestDataMessage *fenixExecutionWorkerGrpcApi.
-			ProcessTestInstructionExecutionReveredRequest_TestDataMessage_ManualOverrideForTestDataMessage
-		tempManualOverrideForTestDataMessage = &fenixExecutionWorkerGrpcApi.
-			ProcessTestInstructionExecutionReveredRequest_TestDataMessage_ManualOverrideForTestDataMessage{
-			TestDataSetAttributeUuid:  pubSubManualOverrideForTestData.GetTestDataSetAttributeUuid(),
-			TestDataSetAttributeName:  pubSubManualOverrideForTestData.GetTestDataSetAttributeName(),
-			TestDataSetAttributeValue: pubSubManualOverrideForTestData.GetTestDataSetAttributeValue(),
+		// Got an OK MaxExpectedFinishedTimeStamp, so generate OK response message to Worker
+		processTestInstructionExecutionResponse = &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionResponse{
+			AckNackResponse: &fenixExecutionWorkerGrpcApi.AckNackResponse{
+				AckNack:                      true,
+				Comments:                     "",
+				ErrorCodes:                   nil,
+				ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.CurrentFenixExecutionWorkerProtoFileVersionEnum(common_config.GetHighestExecutionWorkerProtoFileVersion()),
+			},
+			TestInstructionExecutionUuid:   processTestInstructionExecutionPubSubRequest.TestInstruction.TestInstructionExecutionUuid,
+			ExpectedExecutionDuration:      timestamppb.New(maxExpectedFinishedTimeStamp),
+			TestInstructionCanBeReExecuted: false,
 		}
-
-		// Append to slice of 'TestInstructionAttributes'
-		tempManualOverrideForTestDataSlice = append(tempManualOverrideForTestDataSlice, tempManualOverrideForTestDataMessage)
 	}
-
-	processTestInstructionExecutionReveredRequest.TestData.ManualOverrideForTestData = tempManualOverrideForTestDataSlice
-
-	// Call 'CA' backend to convert 'TestInstruction' into useful structure later to be used by FangEngine
-	var tempProcessTestInstructionExecutionResponse *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionResponse
-	var fangEngineRestApiMessageValues *restCallsToCAEngine.FangEngineRestApiMessageStruct
-	_, tempProcessTestInstructionExecutionResponse, fangEngineRestApiMessageValues =
-		messagesToExecutionWorkerServer.ConvertTestInstructionIntoFangEngineStructure(
-			processTestInstructionExecutionReveredRequest)
 
 	// Send 'ProcessTestInstructionExecutionPubSubRequest-response' back to worker over direct gRPC-call
-	couldSend, returnMessage := connectorEngine.TestInstructionExecutionEngine.
+	couldSend, returnMessage = connectorEngine.TestInstructionExecutionEngine.
 		MessagesToExecutionWorkerObjectReference.
-		SendConnectorProcessTestInstructionExecutionResponse(tempProcessTestInstructionExecutionResponse)
+		SendConnectorProcessTestInstructionExecutionResponse(processTestInstructionExecutionResponse)
 
 	if couldSend == false {
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":            "55820706-bd18-41a6-be0a-c7d3b649e0e2",
+			"ID":            "34f286c7-24c2-480e-8f57-adea8b96380c",
 			"returnMessage": returnMessage,
 		}).Error("Couldn't send response to Worker")
 
+		// Drop this message, without sending 'Ack'
 		err = errors.New(returnMessage)
 		return err
 
 	} else {
 
-		// Send TestInstruction to FangEngine using RestCall
+		// Send TestInstruction to Connector via call-back
 		var finalTestInstructionExecutionResultMessage *fenixExecutionWorkerGrpcApi.FinalTestInstructionExecutionResultMessage
-		finalTestInstructionExecutionResultMessage = messagesToExecutionWorkerServer.SendTestInstructionToFangEngineUsingRestCall(
-			fangEngineRestApiMessageValues, processTestInstructionExecutionReveredRequest)
+		finalTestInstructionExecutionResultMessage, err = common_config.ConnectorFunctionsToDoCallBackOn.
+			ProcessTestInstructionExecutionRequest(&processTestInstructionExecutionPubSubRequest)
 
-		// Send 'ProcessTestInstructionExecutionReversedResponse' back to worker over direct gRPC-call
-		couldSend, returnMessage := connectorEngine.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
+		if err != nil {
+			common_config.Logger.WithFields(logrus.Fields{
+				"ID":  "60598841-9c08-410c-ad63-c8ac7ee10db4",
+				"err": err.Error(),
+			}).Error("Got some error when sending TestInstruction for processing by Connector via call-back")
+		}
+
+		// Send 'FinalTestInstructionExecutionResultMessage' back to worker over direct gRPC-call
+		couldSend, returnMessage = connectorEngine.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 			SendReportCompleteTestInstructionExecutionResultToFenixWorkerServer(finalTestInstructionExecutionResultMessage)
 
 		if couldSend == false {
@@ -156,9 +138,9 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 		} else {
 
 			// Send 'Ack' back to PubSub-system that message has taken care of
-			return err
+			return nil
 		}
+
 	}
 
-	return err
 }

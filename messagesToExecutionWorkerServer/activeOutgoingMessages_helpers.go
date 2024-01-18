@@ -1,11 +1,11 @@
 package messagesToExecutionWorkerServer
 
 import (
-	"FenixSCConnector/common_config"
-	"FenixSCConnector/grpcurl"
 	"context"
 	"crypto/tls"
 	"encoding/base64"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/grpcurl"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -134,7 +134,7 @@ func dialFromGrpcurl(ctx context.Context) (context.Context, *grpc.ClientConn) {
 
 	creds = credentials.NewTLS(tlsConf)
 
-	grpcurlUA := "FenixSCConnector"
+	grpcurlUA := "github.com/jlambert68/FenixConnectorAdminShared"
 	//if grpcurl.version == grpcurl.no_version {
 	//	grpcurlUA = "grpcurl/dev-build (no version set)"
 	//}

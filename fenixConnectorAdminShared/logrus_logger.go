@@ -1,7 +1,7 @@
-package main
+package fenixConnectorAdminShared
 
 import (
-	"FenixSCConnector/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/sirupsen/logrus"
 	"log"
 	"os"

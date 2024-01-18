@@ -1,12 +1,12 @@
 package gcp
 
 import (
-	"FenixSCConnector/common_config"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/pat"
 	"github.com/gorilla/sessions"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"

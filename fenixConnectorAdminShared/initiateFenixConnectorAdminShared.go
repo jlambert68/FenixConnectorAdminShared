@@ -1,15 +1,17 @@
-package main
+package fenixConnectorAdminShared
 
 import (
-	"FenixSCConnector/common_config"
-	"FenixSCConnector/gcp"
-	"FenixSCConnector/restCallsToCAEngine"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"time"
 )
 
-func main() {
+func InitiateFenixConnectorAdminShared() {
+
+	// Run 'init()'
+	fenixConnectorAdminSharedInit()
 
 	// Initiate logger in common_config
 	InitLogger("")
@@ -32,23 +34,6 @@ func main() {
 			}).Fatalf("Couldn't generate access token for GCP, return message: '%s'", returnMessageString)
 
 		}
-	}
-
-	// InitiateRestCallsToCAEngine()
-	restCallsToCAEngine.InitiateRestCallsToCAEngine()
-
-	// If local web server, used for testing, should be used instead of FangEngine
-	if common_config.UseInternalWebServerForTest == true {
-
-		common_config.Logger.WithFields(logrus.Fields{
-			"id": "353930b1-5c6f-4826-955c-19f543e2ab85",
-		}).Info("Using internal web server instead of FangEngine, for RestCall")
-
-		// Run local test web server in a go-routine
-		go func() {
-			restCallsToCAEngine.RestAPIServer()
-		}()
-
 	}
 
 	// Start Connector Engine

@@ -26,14 +26,10 @@ var (
 	FenixExecutionWorkerAddressToDial                               string
 	ExecutionConnectorPort                                          int
 	GCPAuthentication                                               bool
-	CAEngineAddress                                                 string
-	CAEngineAddressPath                                             string
-	UseInternalWebServerForTest                                     bool
-	UseServiceAccount                                               bool
-	ApplicationShouldRunInTray                                      bool
 	TurnOffCallToWorker                                             bool
 	AuthClientId                                                    string
 	AuthClientSecret                                                string
+	UseServiceAccount                                               bool
 	GcpProject                                                      string
 	UsePubSubToReceiveMessagesFromWorker                            bool
 	LocalServiceAccountPath                                         string

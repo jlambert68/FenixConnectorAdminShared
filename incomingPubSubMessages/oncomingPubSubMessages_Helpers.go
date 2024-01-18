@@ -1,6 +1,6 @@
 package incomingPubSubMessages
 
-import "FenixSCConnector/common_config"
+import "github.com/jlambert68/FenixConnectorAdminShared/common_config"
 
 // Create the PubSub-topic from Domain-Uuid
 func generatePubSubTopicNameForExecutionStatusUpdates() (statusExecutionTopic string) {

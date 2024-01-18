@@ -1,11 +1,11 @@
 package incomingPubSubMessages
 
 import (
-	"FenixSCConnector/common_config"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"

@@ -1,9 +1,9 @@
 package incomingPubSubMessages
 
 import (
-	"FenixSCConnector/common_config"
-	"FenixSCConnector/gcp"
 	"context"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/sirupsen/logrus"
 	"time"
 )

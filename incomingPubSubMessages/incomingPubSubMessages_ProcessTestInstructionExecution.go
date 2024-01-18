@@ -1,13 +1,13 @@
 package incomingPubSubMessages
 
 import (
-	"FenixSCConnector/common_config"
-	"FenixSCConnector/gcp"
 	"cloud.google.com/go/pubsub"
 	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"

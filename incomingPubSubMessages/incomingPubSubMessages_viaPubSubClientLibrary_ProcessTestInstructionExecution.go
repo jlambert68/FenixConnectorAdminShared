@@ -1,11 +1,11 @@
 package incomingPubSubMessages
 
 import (
-	"FenixSCConnector/common_config"
 	"cloud.google.com/go/pubsub"
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/option"

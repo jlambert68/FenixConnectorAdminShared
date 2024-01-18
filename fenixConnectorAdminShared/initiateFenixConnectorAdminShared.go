@@ -1,6 +1,7 @@
 package fenixConnectorAdminShared
 
 import (
+	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/sirupsen/logrus"
@@ -12,6 +13,9 @@ func InitiateFenixConnectorAdminShared(connectorFunctionsToDoCallBackOn *common_
 
 	// Store references to call-back functions
 	common_config.ConnectorFunctionsToDoCallBackOn = connectorFunctionsToDoCallBackOn
+
+	myTime, _ := common_config.ConnectorFunctionsToDoCallBackOn.GetMaxExpectedFinishedTimeStamp()
+	fmt.Println(myTime)
 
 	// Run 'init()'
 	fenixConnectorAdminSharedInit()

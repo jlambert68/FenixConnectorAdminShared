@@ -1,10 +1,8 @@
 package connectorEngine
 
 import (
-	"FenixSCConnector/common_config"
-	fenixExecutionConnectorGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionConnectorGrpcApi/go_grpc_api"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 // Channel reader which is used for reading out commands to CommandEngine
@@ -18,12 +16,6 @@ func (executionEngine *TestInstructionExecutionEngineStruct) startCommandChannel
 
 		switch incomingChannelCommand.ChannelCommand {
 
-		case ChannelCommandTriggerRequestForTestInstructionExecutionToProcess:
-			executionEngine.initiateConnectorRequestForProcessTestInstructionExecution()
-
-		case ChannelCommandTriggerRequestForTestInstructionExecutionToProcessIn5Seconds:
-			executionEngine.initiateConnectorRequestForProcessTestInstructionExecutionInXSeconds(1 * 1)
-
 		// No other command is supported
 		default:
 			common_config.Logger.WithFields(logrus.Fields{
@@ -35,6 +27,7 @@ func (executionEngine *TestInstructionExecutionEngineStruct) startCommandChannel
 
 }
 
+/*
 // Call Worker to get TestInstructions to Execute, which is done as a message stream in the response from the Worker
 func (executionEngine *TestInstructionExecutionEngineStruct) initiateConnectorRequestForProcessTestInstructionExecution() {
 
@@ -43,6 +36,8 @@ func (executionEngine *TestInstructionExecutionEngineStruct) initiateConnectorRe
 
 }
 
+*/
+/*
 // Call Worker in X seconds, due to some connection error, to get TestInstructions to Execute, which is done as a message stream in the response from the Worker
 func (executionEngine *TestInstructionExecutionEngineStruct) initiateConnectorRequestForProcessTestInstructionExecutionInXSeconds(waitTimeInSeconds int) {
 
@@ -83,6 +78,8 @@ func (executionEngine *TestInstructionExecutionEngineStruct) initiateConnectorRe
 
 }
 
+
+*/
 // Check ongoing executions  for TestInstructions for change in status that should be propagated to other places
 func (executionEngine *TestInstructionExecutionEngineStruct) checkOngoingExecutionsForTestInstructions() {
 

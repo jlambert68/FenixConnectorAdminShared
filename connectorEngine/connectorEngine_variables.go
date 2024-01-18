@@ -1,7 +1,7 @@
 package connectorEngine
 
 import (
-	"FenixSCConnector/messagesToExecutionWorkerServer"
+	"github.com/jlambert68/FenixConnectorAdminShared/messagesToExecutionWorkerServer"
 	fenixExecutionConnectorGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionConnectorGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 )

@@ -15,6 +15,8 @@ type MessagesToExecutionWorkerObjectStruct struct {
 	connectionToWorkerInitiated bool
 }
 
+var MessagesToExecutionWorkerObject MessagesToExecutionWorkerObjectStruct
+
 // Variables used for contacting Fenix Execution Worker Server
 var (
 	remoteFenixExecutionWorkerServerConnection *grpc.ClientConn

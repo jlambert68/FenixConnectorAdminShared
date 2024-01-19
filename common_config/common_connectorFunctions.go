@@ -22,8 +22,7 @@ type ConnectorCallBackFunctionsStruct struct {
 
 	// Initiate callers logger
 	InitiateLogger func(
-		logger *logrus.Logger) (
-		err error)
+		logger *logrus.Logger)
 }
 
 // ConnectorFunctionsToDoCallBackOn

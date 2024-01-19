@@ -10,7 +10,8 @@ import (
 // Struct holding the functions that can be used via call-back to Connector
 type ConnectorCallBackFunctionsStruct struct {
 	// Gets the max time for when the TestInstructionExecution can be seen as "dead"
-	GetMaxExpectedFinishedTimeStamp func() (
+	GetMaxExpectedFinishedTimeStamp func(
+		testInstructionExecutionPubSubRequest *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest) (
 		maxExpectedFinishedTimeStamp time.Time,
 		err error)
 

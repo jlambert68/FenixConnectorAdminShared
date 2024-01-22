@@ -51,7 +51,8 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 	// Gets the max time for when the TestInstructionExecution can be seen as "dead", by doing callback to code in Connector
 	var maxExpectedFinishedTimeStamp time.Time
 	var processTestInstructionExecutionResponse *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionResponse
-	maxExpectedFinishedTimeStamp, err = common_config.ConnectorFunctionsToDoCallBackOn.GetMaxExpectedFinishedTimeStamp()
+	maxExpectedFinishedTimeStamp, err = common_config.ConnectorFunctionsToDoCallBackOn.GetMaxExpectedFinishedTimeStamp(
+		&processTestInstructionExecutionPubSubRequest)
 
 	// Response from GetMaxExpectedFinishedTimeStamp-call
 	if err != nil {

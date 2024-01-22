@@ -15,9 +15,6 @@ type GcpObjectStruct struct {
 	gcpAccessTokenForAuthorizedAccountsPubSub goth.User
 
 	refreshTokenResponse *RefreshTokenResponse
-
-	// The following token is received from Worker, needs to be this due to the setup at SEB
-	GcpAccessTokenFromWorkerToBeUsedWithPubSub string
 }
 
 var Gcp GcpObjectStruct

@@ -35,6 +35,7 @@ var (
 	LocalServiceAccountPath                                         string
 	TestInstructionExecutionPubSubTopicBase                         string
 	ThisDomainsUuid                                                 string
+	ThisExecutionDomainUuid                                         string
 	UseNativeGcpPubSubClientLibrary                                 bool
 	ForceNewBaseLineForTestInstructionsAndTestInstructionContainers bool
 )

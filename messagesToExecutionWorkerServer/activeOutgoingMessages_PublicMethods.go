@@ -2,18 +2,16 @@ package messagesToExecutionWorkerServer
 
 import (
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
-	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
-	"github.com/jlambert68/FenixTestInstructionsDataAdmin/Domains"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
 func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) ConnectorIsReadyToReceiveWork(
 	stopSending *chan common_config.StopAliveToWorkerTickerChannelStruct,
-	accessTokenReceivedChannelPtr *chan bool) {
+	connectorIsReadyToReceiveWorkChannelPtr *chan bool) {
 
-	accessTokenReceivedChannel := *accessTokenReceivedChannelPtr
+	connectorIsReadyToReceiveWorkChannel := *connectorIsReadyToReceiveWorkChannelPtr
 
 	common_config.Logger.WithFields(logrus.Fields{
 		"id": "0c8aa2a2-6f3a-478e-95c8-352f28dfe488",
@@ -27,7 +25,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) ConnectorI
 	var connectorIsReadyMessage *fenixExecutionWorkerGrpcApi.ConnectorIsReadyMessage
 	connectorIsReadyMessage = &fenixExecutionWorkerGrpcApi.ConnectorIsReadyMessage{
 		ClientSystemIdentification: &fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage{
-			DomainUuid: string(Domains.DomainUUID_CA),
+			DomainUuid:          common_config.ThisDomainsUuid,
+			ExecutionDomainUuid: common_config.ThisExecutionDomainUuid,
 			ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.
 				CurrentFenixExecutionWorkerProtoFileVersionEnum(common_config.GetHighestExecutionWorkerProtoFileVersion()),
 		},
@@ -42,12 +41,11 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) ConnectorI
 	var incomingChannelMessage common_config.StopAliveToWorkerTickerChannelStruct
 
 	// Call Worker to start with
-	toExecutionWorkerObject.SendConnectorInformsItIsAlive(connectorIsReadyMessage)
+	var err error
+	err = toExecutionWorkerObject.SendConnectorInformsItIsAlive(connectorIsReadyMessage)
 	// If an access token was return then start PubSub subscription receiver
-	if len(gcp.Gcp.GcpAccessTokenFromWorkerToBeUsedWithPubSub) > 0 {
-		accessTokenReceivedChannel <- true
-	} else {
-		accessTokenReceivedChannel <- false
+	if err != nil {
+		connectorIsReadyToReceiveWorkChannel <- true
 	}
 
 	for {

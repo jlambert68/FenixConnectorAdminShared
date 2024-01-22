@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-// SendAreYouAliveToFenixExecutionServer - Ask Execution Connector to check if Worker is up and running
+// SendConnectorInformsItIsAlive - Inform  Worker that Connector is up and running
 func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnectorInformsItIsAlive(
-	connectorIsReadyMessage *fenixExecutionWorkerGrpcApi.ConnectorIsReadyMessage) {
+	connectorIsReadyMessage *fenixExecutionWorkerGrpcApi.ConnectorIsReadyMessage) (err error) {
 
 	/*
 		common_config.Logger.WithFields(logrus.Fields{
@@ -34,9 +34,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 	ctx = context.Background()
 
 	// Set up connection to Server
-	ctx, err := toExecutionWorkerObject.SetConnectionToFenixExecutionWorkerServer(ctx)
+	ctx, err = toExecutionWorkerObject.SetConnectionToFenixExecutionWorkerServer(ctx)
 	if err != nil {
-		return
+		return err
 	}
 
 	// Do gRPC-call
@@ -60,7 +60,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 		ctx, returnMessageAckNack, _ = gcp.Gcp.GenerateGCPAccessToken(
 			ctx, gcp.GetTokenForGrpcAndPubSub)
 		if returnMessageAckNack == false {
-			return
+			return err
 		}
 
 	}
@@ -80,7 +80,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 			"error": err,
 		}).Error("Problem to do gRPC-call to FenixExecutionWorker for 'SendConnectorInformsItIsAlive'")
 
-		return
+		return err
 
 	} else if connectorIsReadyResponseMessage.AckNackResponse.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
@@ -89,12 +89,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 			"Message from Fenix Execution Server": connectorIsReadyResponseMessage.AckNackResponse.Comments,
 		}).Error("Problem to do gRPC-call to FenixExecutionWorker for 'SendConnectorInformsItIsAlive'")
 
-		return
+		return err
 	}
 
-	// Store Access token to be used when doing PubSub-subscriptions
-	gcp.Gcp.GcpAccessTokenFromWorkerToBeUsedWithPubSub = connectorIsReadyResponseMessage.GetPubSubAuthorizationToken()
-
-	return
+	return err
 
 }

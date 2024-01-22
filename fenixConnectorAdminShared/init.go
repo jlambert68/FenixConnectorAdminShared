@@ -273,6 +273,9 @@ func fenixConnectorAdminSharedInit() {
 	// Extract environment variable for 'ThisDomainsUuid'
 	common_config.ThisDomainsUuid = mustGetenv("ThisDomainsUuid")
 
+	// Extract environment variable for 'ThisExecutionDomainUuid'
+	common_config.ThisDomainsUuid = mustGetenv("ThisExecutionDomainUuid")
+
 	// Extract if native pubsub client library should be used or not
 	common_config.UseNativeGcpPubSubClientLibrary, err = strconv.ParseBool(mustGetenv("UseNativeGcpPubSubClientLibrary"))
 	if err != nil {

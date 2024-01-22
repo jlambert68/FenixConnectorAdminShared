@@ -87,8 +87,8 @@ func fenixExecutionConnectorMain() {
 	fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.InitiateTestInstructionExecutionEngineCommandChannelReader(connectorEngine.ExecutionEngineCommandChannel)
 
 	// Channel for informing that an access token was received
-	var accessTokenWasReceivedChannel chan bool
-	accessTokenWasReceivedChannel = make(chan bool)
+	var connectorIsReadyToReceiveWorkChannel chan bool
+	connectorIsReadyToReceiveWorkChannel = make(chan bool)
 
 	// 	Inform Worker that Connector is ready to receive work
 	go func() {
@@ -101,7 +101,7 @@ func fenixExecutionConnectorMain() {
 		time.Sleep(5 * time.Second)
 		// Inform Worker that Connector is Starting Up
 		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
-			ConnectorIsReadyToReceiveWork(&stopSendingAliveToWorkerTickerChannel, &accessTokenWasReceivedChannel)
+			ConnectorIsReadyToReceiveWork(&stopSendingAliveToWorkerTickerChannel, &connectorIsReadyToReceiveWorkChannel)
 
 	}()
 
@@ -110,11 +110,11 @@ func fenixExecutionConnectorMain() {
 
 		if common_config.UseNativeGcpPubSubClientLibrary == true {
 			// Use Native GCP PubSub Client Library
-			go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpClientLib(&accessTokenWasReceivedChannel)
+			go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpClientLib(&connectorIsReadyToReceiveWorkChannel)
 
 		} else {
 			// Use REST to call GCP PubSub
-			go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpRestApi(&accessTokenWasReceivedChannel)
+			go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpRestApi(&connectorIsReadyToReceiveWorkChannel)
 
 		}
 	}

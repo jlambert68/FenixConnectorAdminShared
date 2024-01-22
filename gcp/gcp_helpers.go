@@ -31,7 +31,6 @@ type GenerateTokenTargetType int
 const (
 	GenerateTokenForGrpcTowardsExecutionWorker GenerateTokenTargetType = iota
 	GenerateTokenForPubSub
-	GetTokenFromWorkerForPubSub
 	GetTokenForGrpcAndPubSub
 )
 
@@ -64,13 +63,6 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 			// Use Authorized user
 			appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenPubSub(ctx)
 		}
-
-	case GetTokenFromWorkerForPubSub:
-		// When Worker is run in SEB-GCP, the Worker will give the Connector the token to use
-		// The reason is probably the setup for SEB in GCP
-		appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.GcpAccessTokenFromWorkerToBeUsedWithPubSub)
-		returnAckNack = true
-		returnMessage = ""
 
 	case GetTokenForGrpcAndPubSub:
 		// Only use Authorized used when running locally and WorkerServer is on GCP

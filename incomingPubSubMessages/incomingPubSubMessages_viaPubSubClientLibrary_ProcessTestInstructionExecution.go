@@ -17,9 +17,9 @@ import (
 
 // PullPubSubTestInstructionExecutionMessagesGcpClientLib
 // Use GCP Client Library to subscribe to a PubSub-Topic
-func PullPubSubTestInstructionExecutionMessagesGcpClientLib(accessTokenReceivedChannelPtr *chan bool) {
+func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToReceiveWorkChannelPtr *chan bool) {
 
-	accessTokenReceivedChannel := *accessTokenReceivedChannelPtr
+	connectorIsReadyToReceiveWorkChannel := *connectorIsReadyToReceiveWorkChannelPtr
 
 	common_config.Logger.WithFields(logrus.Fields{
 		"id": "1ed3f12b-65fb-41bc-b12d-ca4af21e8a36",
@@ -31,10 +31,10 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(accessTokenReceivedC
 
 	// Before Starting PubSub-receiver secure that an access token has been received
 	for {
-		var accessTokenReceived bool
-		accessTokenReceived = <-accessTokenReceivedChannel
+		var responseFromWorkerReceived bool
+		responseFromWorkerReceived = <-connectorIsReadyToReceiveWorkChannel
 
-		if accessTokenReceived == true {
+		if responseFromWorkerReceived == true {
 			// Continue when we got an access token
 			break
 		} else {

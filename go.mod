@@ -6,15 +6,12 @@ toolchain go1.21.5
 
 require (
 	cloud.google.com/go/pubsub v1.33.0
-	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/google/uuid v1.4.0
-	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/pat v1.0.1
 	github.com/gorilla/sessions v1.2.1
-	github.com/jlambert68/FenixGrpcApi v0.0.0-20240103180010-f01adaa46d3d
-	github.com/jlambert68/FenixOnPremDemoTestInstructionAdmin v0.0.0-20240115191932-45eeb3be528c
+	github.com/jlambert68/FenixGrpcApi v0.0.0-20240122111939-8133bebfbf94
+	github.com/jlambert68/FenixOnPremDemoTestInstructionAdmin v0.0.0-20240119131806-6adff39a186f
 	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20240103135859-01e613300ea3
-	github.com/jlambert68/FenixTestInstructionsDataAdmin v0.0.0-20230828114544-4a2e793bf60d
 	github.com/markbates/goth v1.78.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/net v0.17.0
@@ -37,6 +34,7 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.11.0 // indirect

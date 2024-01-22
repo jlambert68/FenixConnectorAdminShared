@@ -8,15 +8,16 @@ func generatePubSubTopicNameForExecutionStatusUpdates() (statusExecutionTopic st
 	var pubSubTopicBase string
 	pubSubTopicBase = common_config.TestInstructionExecutionPubSubTopicBase
 
-	var testerGuiApplicationUuid string
-	testerGuiApplicationUuid = common_config.ThisDomainsUuid
+	// Get the first 8 characters from ThisDomainsUuid
+	var shortedThisDomainsUuid string
+	shortedThisDomainsUuid = common_config.ThisDomainsUuid[0:8]
 
-	// Get the first 8 characters from TesterGui-ApplicationUuid
-	var shortedAppUuid string
-	shortedAppUuid = testerGuiApplicationUuid[0:8]
+	// Get the first 8 characters from 'thisExecutionDomainUuid'
+	var shortedThisExecutionDomainUuid string
+	shortedThisExecutionDomainUuid = common_config.ThisExecutionDomainUuid[0:8]
 
 	// Build PubSub-topic
-	statusExecutionTopic = pubSubTopicBase + "-" + shortedAppUuid
+	statusExecutionTopic = pubSubTopicBase + "-" + shortedThisDomainsUuid + "-" + shortedThisExecutionDomainUuid
 
 	return statusExecutionTopic
 }

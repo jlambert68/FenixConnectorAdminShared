@@ -5,8 +5,6 @@ import (
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
-	"github.com/jlambert68/FenixOnPremDemoTestInstructionAdmin/TestInstructionsAndTesInstructionContainersAndAllowedUsers"
-	"github.com/jlambert68/FenixOnPremDemoTestInstructionAdmin/TestInstructionsAndTesInstructionContainersAndAllowedUsers/DomainData"
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/TestInstructionAndTestInstuctionContainerTypes"
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/TypeAndStructs"
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
@@ -28,25 +26,22 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 
 	var err error
 
-	// Create supported TestInstructions, TestInstructionContainers and Allowed Users
-	TestInstructionsAndTesInstructionContainersAndAllowedUsers.GenerateTestInstructionsAndTestInstructionContainersAndAllowedUsers_OnPremDemo()
+	// Do call-back to get all 	// Create supported TestInstructions, TestInstructionContainers and Allowed Users
+	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.TestInstructionsAndTestInstructionsContainersStruct
+	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
 
-	// Make override on if a New Baseline should be saved in database for TestInstructions, TestInstructionContainers and Allowed Users
+	// Make override on if a New Baseline should be saved in database for
+	// TestInstructions, TestInstructionContainers and Allowed Users if environment variable is set
 	if common_config.ForceNewBaseLineForTestInstructionsAndTestInstructionContainers == true {
-
-		TestInstructionsAndTesInstructionContainersAndAllowedUsers.
-			TestInstructionsAndTestInstructionContainersAndAllowedUsers_OnPremDemo.
+		supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers.
 			ForceNewBaseLineForTestInstructionsAndTestInstructionContainers = true
 	}
-
-	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.TestInstructionsAndTestInstructionsContainersStruct
-	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers = TestInstructionsAndTesInstructionContainersAndAllowedUsers.TestInstructionsAndTestInstructionContainersAndAllowedUsers_OnPremDemo
 
 	// Convert supported TestInstructions, TestInstructionContainers and Allowed Users message into a gRPC-Worker version of the message
 	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage *fenixExecutionWorkerGrpcApi.SupportedTestInstructionsAndTestInstructionContainersAndAllowedUsersMessage
 	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage, err = shared_code.
 		GenerateTestInstructionAndTestInstructionContainerAndUserGrpcWorkerMessage(
-			string(DomainData.DomainUUID_OnPremDemo),
+			common_config.ThisDomainsUuid,
 			supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{

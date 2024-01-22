@@ -2,6 +2,7 @@ package common_config
 
 import (
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
+	"github.com/jlambert68/FenixTestInstructionsAdminShared/TestInstructionAndTestInstuctionContainerTypes"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -24,6 +25,11 @@ type ConnectorCallBackFunctionsStruct struct {
 	// Initiate callers logger
 	InitiateLogger func(
 		logger *logrus.Logger)
+
+	// Generates the 'SupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers' that will be sent via gRPC to Worker
+	GenerateSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers func() (
+		supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.
+			TestInstructionsAndTestInstructionsContainersStruct)
 }
 
 // ConnectorFunctionsToDoCallBackOn

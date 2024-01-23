@@ -42,7 +42,9 @@ func cleanup(stopAliveToWorkerTickerChannel *chan common_config.StopAliveToWorke
 		cleanupProcessed = true
 
 		// Cleanup before close down application
-		fenixConnectorAdminSharedObject.logger.WithFields(logrus.Fields{}).Info("Clean up and shut down servers")
+		fenixConnectorAdminSharedObject.logger.WithFields(logrus.Fields{
+			"id": "5a76a42c-66af-464a-a62c-f45f7c3fa2d5",
+		}).Info("Clean up and shut down servers")
 
 	}
 }
@@ -124,11 +126,8 @@ func fenixExecutionConnectorMain() {
 		}
 	}
 
-	// When exiting
-	defer cleanup(&stopSendingAliveToWorkerTickerChannel)
-
 	// Loop and don't exit
-	switch {
+	for {
 
 	}
 

@@ -124,6 +124,14 @@ func fenixExecutionConnectorMain() {
 		}
 	}
 
+	// When exiting
+	defer cleanup(&stopSendingAliveToWorkerTickerChannel)
+
+	// Loop and don't exit
+	switch {
+
+	}
+
 	// Wait for 'ctrl c' to exit
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

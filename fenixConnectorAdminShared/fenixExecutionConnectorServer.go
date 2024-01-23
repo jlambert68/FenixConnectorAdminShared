@@ -93,9 +93,14 @@ func fenixExecutionConnectorMain() {
 	// 	Inform Worker that Connector is ready to receive work
 	go func() {
 
-		// Send Supported TestInstructions, TesInstructionContainers and Allowed Users to Worker
-		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
-			SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
+		// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
+		// Allowed Users to Worker
+		if common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers == true {
+
+			// Send Supported TestInstructions, TesInstructionContainers and Allowed Users to Worker
+			fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
+				SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
+		}
 
 		// Wait 5 seconds before informing Worker that Connector is ready for Work
 		time.Sleep(5 * time.Second)

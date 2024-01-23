@@ -292,4 +292,14 @@ func fenixConnectorAdminSharedInit() {
 		os.Exit(0)
 	}
 
+	// Extract if this is the Connector that sends supported TestInstructions, TestInstructionContainers and
+	// Users to Worker. If not, then this is only a TestExecutionDomain
+	common_config.ForceNewBaseLineForTestInstructionsAndTestInstructionContainers, err = strconv.ParseBool(
+		mustGetenv("ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers"))
+	if err != nil {
+		fmt.Println("Couldn't convert environment variable "+
+			"'ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers:' to an boolean, error: ", err)
+		os.Exit(0)
+	}
+
 }

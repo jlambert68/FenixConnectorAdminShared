@@ -21,21 +21,22 @@ const (
 
 // Address to Fenix Execution Worker & Execution Connector, will have their values from Environment variables at startup
 var (
-	FenixExecutionWorkerAddress                                     string
-	FenixExecutionWorkerPort                                        int
-	FenixExecutionWorkerAddressToDial                               string
-	ExecutionConnectorPort                                          int
-	GCPAuthentication                                               bool
-	TurnOffCallToWorker                                             bool
-	AuthClientId                                                    string
-	AuthClientSecret                                                string
-	UseServiceAccount                                               bool
-	GcpProject                                                      string
-	UsePubSubToReceiveMessagesFromWorker                            bool
-	LocalServiceAccountPath                                         string
-	TestInstructionExecutionPubSubTopicBase                         string
-	ThisDomainsUuid                                                 string
-	ThisExecutionDomainUuid                                         string
-	UseNativeGcpPubSubClientLibrary                                 bool
-	ForceNewBaseLineForTestInstructionsAndTestInstructionContainers bool
+	FenixExecutionWorkerAddress                                                           string
+	FenixExecutionWorkerPort                                                              int
+	FenixExecutionWorkerAddressToDial                                                     string
+	ExecutionConnectorPort                                                                int
+	GCPAuthentication                                                                     bool
+	TurnOffCallToWorker                                                                   bool
+	AuthClientId                                                                          string
+	AuthClientSecret                                                                      string
+	UseServiceAccount                                                                     bool
+	GcpProject                                                                            string
+	UsePubSubToReceiveMessagesFromWorker                                                  bool
+	LocalServiceAccountPath                                                               string
+	TestInstructionExecutionPubSubTopicBase                                               string
+	ThisDomainsUuid                                                                       string
+	ThisExecutionDomainUuid                                                               string
+	UseNativeGcpPubSubClientLibrary                                                       bool
+	ForceNewBaseLineForTestInstructionsAndTestInstructionContainers                       bool
+	ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers bool
 )

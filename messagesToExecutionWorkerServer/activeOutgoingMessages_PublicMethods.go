@@ -43,8 +43,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) ConnectorI
 	// Call Worker to start with
 	var err error
 	err = toExecutionWorkerObject.SendConnectorInformsItIsAlive(connectorIsReadyMessage)
-	// If an access token was return then start PubSub subscription receiver
-	if err != nil {
+	// When return then start PubSub subscription receiver
+	if err == nil {
 		connectorIsReadyToReceiveWorkChannel <- true
 	}
 

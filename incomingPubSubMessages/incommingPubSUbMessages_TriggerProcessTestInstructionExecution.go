@@ -123,6 +123,16 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 			}).Error("Got some error when sending TestInstruction for processing by Connector via call-back")
 		}
 
+		// Add Domain-information
+		var tempClientSystemIdentificationMessage *fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage
+		tempClientSystemIdentificationMessage = &fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage{
+			DomainUuid:          common_config.ThisDomainsUuid,
+			ExecutionDomainUuid: common_config.ThisExecutionDomainUuid,
+			ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.CurrentFenixExecutionWorkerProtoFileVersionEnum(
+				common_config.GetHighestExecutionWorkerProtoFileVersion()),
+		}
+		finalTestInstructionExecutionResultMessage.ClientSystemIdentification = tempClientSystemIdentificationMessage
+
 		// Send 'FinalTestInstructionExecutionResultMessage' back to worker over direct gRPC-call
 		couldSend, returnMessage = connectorEngine.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 			SendReportCompleteTestInstructionExecutionResultToFenixWorkerServer(finalTestInstructionExecutionResultMessage)

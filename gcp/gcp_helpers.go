@@ -137,19 +137,11 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 // Generate Google access token for Pub Sub
 func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
-	// Secure that User is initiated
-	gcp.initiateServiceAccountsPubSub()
-
 	// Only create the token if there is none, or it has expired (or 5 minutes before expiration
 	var safetyDuration time.Duration
-	var timeToCompareTo time.Time
-	safetyDuration = 5 * time.Minute
-	if gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken != "" {
+	safetyDuration = -5 * time.Minute
 
-		timeToCompareTo = gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry.Add(safetyDuration)
-	}
-
-	if gcp.gcpAccessTokenForServiceAccountsPubSub == nil || timeToCompareTo.After(time.Now()) {
+	if gcp.gcpAccessTokenForServiceAccountsPubSub == nil || gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry.Add(safetyDuration).Before(time.Now()) {
 
 		// Create an identity token.
 		// With a global TokenSource tokens would be reused and auto-refreshed at need.
@@ -859,19 +851,5 @@ func (gcp *GcpObjectStruct) initiateUserObjectPubSub() {
 	}
 
 	return
-
-}
-
-// Set to use the same Logger reference as is used by central part of system
-func (gcp *GcpObjectStruct) initiateServiceAccountsPubSub() {
-
-	// Only do initiation if it's not done before
-
-	if gcp.gcpAccessTokenForServiceAccountsPubSub == nil {
-		gcp.gcpAccessTokenForServiceAccountsPubSub = &oauth2.Token{}
-
-		return
-
-	}
 
 }

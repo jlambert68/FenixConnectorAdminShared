@@ -23,6 +23,8 @@ func InitiateFenixConnectorAdminShared(
 	// Initiate Logger via Call-back
 	common_config.ConnectorFunctionsToDoCallBackOn.InitiateLogger(common_config.Logger)
 
+	//
+
 	// When Execution Worker runs on GCP, then set up access
 	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP &&
 		common_config.GCPAuthentication == true &&

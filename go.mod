@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/pat v1.0.2
 	github.com/gorilla/sessions v1.2.2
 	github.com/jlambert68/FenixGrpcApi v0.0.0-20240129152625-acb237e2fb83
-	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20240129172215-b8cfdc2adfaf
+	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20240131100523-b5b16ba6ecb9
 	github.com/markbates/goth v1.78.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/net v0.20.0

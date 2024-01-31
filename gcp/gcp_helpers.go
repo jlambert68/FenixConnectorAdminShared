@@ -182,7 +182,7 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.
-	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccounts.AccessToken)
+	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken)
 
 	return appendedCtx, true, ""
 

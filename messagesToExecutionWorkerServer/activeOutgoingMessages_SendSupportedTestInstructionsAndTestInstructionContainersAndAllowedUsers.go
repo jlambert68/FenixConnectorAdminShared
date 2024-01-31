@@ -127,9 +127,14 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	numberOfgRPCCallAttempts = len(sleepTimeBetweenGrpcCallAttempts)
 	gRPCCallAttemptCounter = 0
 
+	// Creates a new temporary client only to be used for this call
+	var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
+	tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
+		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
+
 	for {
 
-		returnMessage, err := fenixExecutionWorkerGrpcClient.
+		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.
 			ConnectorPublishSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers(
 				ctx,
 				supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage)

@@ -86,9 +86,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 
 	// Only create the token if there is none, or it has expired (or 5 minutes before expiration
 	var safetyDuration time.Duration
-	safetyDuration = 5 * time.Minute
-	timeToCompareTo := gcp.gcpAccessTokenForServiceAccounts.Expiry.Add(safetyDuration)
-	if gcp.gcpAccessTokenForServiceAccounts == nil || timeToCompareTo.After(time.Now()) {
+	safetyDuration = -5 * time.Minute
+	if gcp.gcpAccessTokenForServiceAccounts == nil || gcp.gcpAccessTokenForServiceAccounts.Expiry.Add(safetyDuration).Before(time.Now()) {
 
 		// Create an identity token.
 		// With a global TokenSource tokens would be reused and auto-refreshed at need.

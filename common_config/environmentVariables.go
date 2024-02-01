@@ -32,6 +32,7 @@ var (
 	UseServiceAccount                                                                     bool
 	GcpProject                                                                            string
 	UsePubSubToReceiveMessagesFromWorker                                                  bool
+	ShouldPubSubReceiverBeStarted                                                         bool
 	LocalServiceAccountPath                                                               string
 	TestInstructionExecutionPubSubTopicBase                                               string
 	ThisDomainsUuid                                                                       string

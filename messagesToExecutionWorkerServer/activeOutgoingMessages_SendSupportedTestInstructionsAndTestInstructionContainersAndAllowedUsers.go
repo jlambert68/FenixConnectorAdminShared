@@ -104,7 +104,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}()
 
 	// Only add access token when run on GCP
-	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP && common_config.GCPAuthentication == true {
+	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP &&
+		common_config.GCPAuthentication == true {
 
 		// Add Access token
 		ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GenerateTokenForGrpcTowardsExecutionWorker)

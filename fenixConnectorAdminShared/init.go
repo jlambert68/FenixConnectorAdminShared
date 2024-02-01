@@ -302,4 +302,13 @@ func fenixConnectorAdminSharedInit() {
 		os.Exit(0)
 	}
 
+	// Extract if PubSubReceiver be started
+	common_config.ShouldPubSubReceiverBeStarted, err = strconv.ParseBool(
+		mustGetenv("ShouldPubSubReceiverBeStarted"))
+	if err != nil {
+		fmt.Println("Couldn't convert environment variable "+
+			"'ShouldPubSubReceiverBeStarted:' to an boolean, error: ", err)
+		os.Exit(0)
+	}
+
 }

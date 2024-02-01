@@ -112,17 +112,20 @@ func fenixExecutionConnectorMain() {
 
 	}()
 
-	// Start up PubSub-receiver
-	if common_config.UsePubSubToReceiveMessagesFromWorker == true {
+	// Start up PubSub-receiver, if it should
+	if common_config.ShouldPubSubReceiverBeStarted == true {
 
-		if common_config.UseNativeGcpPubSubClientLibrary == true {
-			// Use Native GCP PubSub Client Library
-			go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpClientLib(&connectorIsReadyToReceiveWorkChannel)
+		if common_config.UsePubSubToReceiveMessagesFromWorker == true {
 
-		} else {
-			// Use REST to call GCP PubSub
-			go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpRestApi(&connectorIsReadyToReceiveWorkChannel)
+			if common_config.UseNativeGcpPubSubClientLibrary == true {
+				// Use Native GCP PubSub Client Library
+				go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpClientLib(&connectorIsReadyToReceiveWorkChannel)
 
+			} else {
+				// Use REST to call GCP PubSub
+				go incomingPubSubMessages.PullPubSubTestInstructionExecutionMessagesGcpRestApi(&connectorIsReadyToReceiveWorkChannel)
+
+			}
 		}
 	}
 

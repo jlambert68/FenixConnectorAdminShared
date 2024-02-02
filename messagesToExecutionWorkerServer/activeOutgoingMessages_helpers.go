@@ -20,27 +20,6 @@ import (
 
 // SetConnectionToFenixExecutionWorkerServer - Set upp connection and Dial to FenixExecutionServer
 func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SetConnectionToFenixExecutionWorkerServer(ctx context.Context) (_ context.Context, err error) {
-	/* THis is done in the new
-	var opts []grpc.DialOption
-
-	systemRoots, err := x509.SystemCertPool()
-	if err != nil {
-		panic(fmt.Sprintf("cannot load root CA certs, err: %s", err))
-	}
-
-	//When running on GCP then use credential otherwise not
-
-	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP {
-		creds := credentials.NewTLS(&tls.Config{
-			InsecureSkipVerify: true,
-			RootCAs:            systemRoots,
-		})
-
-		opts = []grpc.DialOption{
-			grpc.WithTransportCredentials(creds),
-		}
-	}
-	*/
 
 	// slice with sleep time, in milliseconds, between each attempt to Dial to Worker
 	var sleepTimeBetweenDialAttempts []int

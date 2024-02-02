@@ -5,12 +5,10 @@ import (
 	uuidGenerator "github.com/google/uuid"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/connectorEngine"
+	"github.com/jlambert68/FenixConnectorAdminShared/gRPCServer"
 	"github.com/jlambert68/FenixConnectorAdminShared/incomingPubSubMessages"
 	"github.com/jlambert68/FenixConnectorAdminShared/messagesToExecutionWorkerServer"
 	"github.com/sirupsen/logrus"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -129,18 +127,8 @@ func fenixExecutionConnectorMain() {
 		}
 	}
 
-	// Loop and don't exit
-	for {
-
-	}
-
-	// Wait for 'ctrl c' to exit
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		cleanup(&stopSendingAliveToWorkerTickerChannel)
-		os.Exit(0)
-	}()
+	// Initiate and start the Worker gRPC-server
+	gRPCServer.FenixConnectorGrpcServicesServerObject = &gRPCServer.FenixConnectorGrpcServicesServerStruct{}
+	gRPCServer.FenixConnectorGrpcServicesServerObject.InitGrpcServer()
 
 }

@@ -48,27 +48,4 @@ func InitiateFenixConnectorAdminShared(
 	// Start Connector Engine
 	fenixExecutionConnectorMain()
 
-	/*
-
-		// Run as console program and exit as on standard exiting signals
-		sig := make(chan os.Signal, 1)
-		done := make(chan bool, 1)
-
-		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-
-		go func() {
-			sig := <-sig
-			fmt.Println()
-			fmt.Println(sig)
-			done <- true
-
-			fmt.Println("ctrl+c")
-		}()
-
-		fmt.Println("awaiting signal")
-		<-done
-		fmt.Println("exiting")
-
-	*/
-
 }

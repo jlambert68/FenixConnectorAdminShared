@@ -43,7 +43,7 @@ func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) WorkerAr
 
 	ackNackResponseMessage := &fenixExecutionConnectorGrpcApi.AckNackResponse{
 		AckNack:                         response,
-		Comments:                        fmt.Sprintf("The response from Worker is '%fenixConnectorGrpcObject'", responseMessage),
+		Comments:                        fmt.Sprintf("The response from Worker is '%s'", responseMessage),
 		ErrorCodes:                      errorCodes,
 		ProtoFileVersionUsedByConnector: fenixExecutionConnectorGrpcApi.CurrentFenixExecutionConnectorProtoFileVersionEnum(common_config.GetHighestConnectorProtoFileVersion()),
 	}

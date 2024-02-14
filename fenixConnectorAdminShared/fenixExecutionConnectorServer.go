@@ -90,29 +90,29 @@ func fenixExecutionConnectorMain() {
 	var connectorIsReadyToReceiveWorkChannel chan bool
 	connectorIsReadyToReceiveWorkChannel = make(chan bool)
 
-	// Should there be any communication out from Connector
-	if common_config.TurnOffAllCommunicationWithWorker == false {
+	// 	Inform Worker that Connector is ready to receive work
+	go func() {
 
-		// 	Inform Worker that Connector is ready to receive work
-		go func() {
+		// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
+		// Allowed Users to Worker
+		if common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers == true {
 
-			// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
-			// Allowed Users to Worker
-			if common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers == true {
+			// Send Supported TestInstructions, TesInstructionContainers and Allowed Users to Worker
+			fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
+				SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
+		}
 
-				// Send Supported TestInstructions, TesInstructionContainers and Allowed Users to Worker
-				fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
-					SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
-			}
+		// Should there be any communication out from Connector
+		if common_config.TurnOffAllCommunicationWithWorker == false {
 
 			// Wait 5 seconds before informing Worker that Connector is ready for Work
 			time.Sleep(5 * time.Second)
 			// Inform Worker that Connector is Starting Up
 			fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 				ConnectorIsReadyToReceiveWork(&stopSendingAliveToWorkerTickerChannel, &connectorIsReadyToReceiveWorkChannel)
+		}
 
-		}()
-	}
+	}()
 
 	// Start up PubSub-receiver, if it should
 	if common_config.ShouldPubSubReceiverBeStarted == true && common_config.TurnOffAllCommunicationWithWorker == false {

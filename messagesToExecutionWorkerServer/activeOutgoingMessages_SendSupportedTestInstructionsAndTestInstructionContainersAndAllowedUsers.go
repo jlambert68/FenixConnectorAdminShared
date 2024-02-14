@@ -78,6 +78,11 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 			"in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
 	}
 
+	// When there should be no traffic towards Worker then just return
+	if common_config.TurnOffAllCommunicationWithWorker == true {
+		return
+	}
+
 	var ctx context.Context
 	var returnMessageAckNack bool
 	var returnMessageString string

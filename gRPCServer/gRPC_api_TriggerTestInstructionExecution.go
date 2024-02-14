@@ -13,7 +13,7 @@ import (
 // done towards external execution. Can use local Test WebServer, internal execution logic or external execution logic
 func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) TriggerTestInstructionExecution(
 	ctx context.Context,
-	processTestInstructionExecutionPubSubRequest *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest) (
+	triggerProcessTestInstructionExecutionPubSubRequest *fenixExecutionConnectorGrpcApi.TriggerProcessTestInstructionExecutionPubSubRequest) (
 	*fenixExecutionConnectorGrpcApi.AckNackResponse, error) {
 
 	common_config.Logger.WithFields(logrus.Fields{
@@ -31,13 +31,103 @@ func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) TriggerT
 	returnMessage := common_config.IsCallerUsingCorrectConnectorProtoFileVersion(
 		userID,
 		fenixExecutionConnectorGrpcApi.CurrentFenixExecutionConnectorProtoFileVersionEnum(
-			processTestInstructionExecutionPubSubRequest.GetDomainIdentificationAnfProtoFileVersionUsedByClient().
+			triggerProcessTestInstructionExecutionPubSubRequest.GetDomainIdentificationAnfProtoFileVersionUsedByClient().
 				GetProtoFileVersionUsedByClient()))
 	if returnMessage != nil {
 
 		// Exiting
 		return returnMessage, nil
 	}
+
+	// Convert 'triggerProcessTestInstructionExecutionPubSubRequest' into 'processTestInstructionExecutionPubSubRequest'
+	var processTestInstructionExecutionPubSubRequest *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest
+	processTestInstructionExecutionPubSubRequest = &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest{
+		DomainIdentificationAnfProtoFileVersionUsedByClient: &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest_ClientSystemIdentificationMessage{
+			DomainUuid: triggerProcessTestInstructionExecutionPubSubRequest.
+				GetDomainIdentificationAnfProtoFileVersionUsedByClient().GetDomainUuid(),
+			ExecutionDomainUuid: triggerProcessTestInstructionExecutionPubSubRequest.
+				GetDomainIdentificationAnfProtoFileVersionUsedByClient().GetExecutionDomainUuid(),
+			ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.
+				ProcessTestInstructionExecutionPubSubRequest_CurrentFenixExecutionWorkerProtoFileVersionEnum(
+					triggerProcessTestInstructionExecutionPubSubRequest.
+						GetDomainIdentificationAnfProtoFileVersionUsedByClient().GetProtoFileVersionUsedByClient()),
+		},
+		TestInstruction: &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest_TestInstructionExecutionMessage{
+			TestInstructionExecutionUuid: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+				GetTestInstructionExecutionUuid(),
+			TestInstructionUuid: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+				GetTestInstructionUuid(),
+			TestInstructionName: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+				GetTestInstructionName(),
+			MajorVersionNumber: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+				GetMajorVersionNumber(),
+			MinorVersionNumber: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+				GetMinorVersionNumber(),
+			TestInstructionAttributes: nil,
+		},
+		TestCaseExecutionUuid: triggerProcessTestInstructionExecutionPubSubRequest.GetTestCaseExecutionUuid(),
+		TestData: &fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest_TestDataMessage{
+			TestDataSetUuid: triggerProcessTestInstructionExecutionPubSubRequest.GetTestData().
+				GetTestDataSetUuid(),
+			ManualOverrideForTestData: nil,
+		},
+	}
+
+	// Convert 'TestInstructionAttributes' and add
+	var tempTestInstructionAttributes []*fenixExecutionWorkerGrpcApi.
+		ProcessTestInstructionExecutionPubSubRequest_TestInstructionAttributeMessage
+	for _, testInstructionAttribute := range triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+		GetTestInstructionAttributes() {
+
+		// Create a new Attribute copy
+		var tempTestInstructionAttribute *fenixExecutionWorkerGrpcApi.
+			ProcessTestInstructionExecutionPubSubRequest_TestInstructionAttributeMessage
+
+		tempTestInstructionAttribute = &fenixExecutionWorkerGrpcApi.
+			ProcessTestInstructionExecutionPubSubRequest_TestInstructionAttributeMessage{
+			TestInstructionAttributeType: fenixExecutionWorkerGrpcApi.
+				ProcessTestInstructionExecutionPubSubRequest_TestInstructionAttributeTypeEnum(
+					testInstructionAttribute.TestInstructionAttributeType),
+			TestInstructionAttributeUuid:     testInstructionAttribute.TestInstructionAttributeUuid,
+			TestInstructionAttributeName:     testInstructionAttribute.TestInstructionAttributeName,
+			AttributeValueAsString:           testInstructionAttribute.AttributeValueAsString,
+			AttributeValueUuid:               testInstructionAttribute.AttributeValueUuid,
+			TestInstructionAttributeTypeUuid: testInstructionAttribute.TestInstructionAttributeTypeUuid,
+			TestInstructionAttributeTypeName: testInstructionAttribute.TestInstructionAttributeTypeName,
+		}
+
+		// Append Attribute to slice
+		tempTestInstructionAttributes = append(tempTestInstructionAttributes, tempTestInstructionAttribute)
+
+	}
+
+	// Add the converted Attributes
+	processTestInstructionExecutionPubSubRequest.TestInstruction.TestInstructionAttributes = tempTestInstructionAttributes
+
+	// Convert 'ManualOverrideForTestData' and add
+	var tempManualOverrideForTestDataMessages []*fenixExecutionWorkerGrpcApi.
+		ProcessTestInstructionExecutionPubSubRequest_TestDataMessage_ManualOverrideForTestDataMessage
+	for _, manualOverrideForTestData := range triggerProcessTestInstructionExecutionPubSubRequest.GetTestData().
+		GetManualOverrideForTestData() {
+
+		// Create a new ManualOverrideForTestData copy
+		var tempManualOverrideForTestDataMessage *fenixExecutionWorkerGrpcApi.
+			ProcessTestInstructionExecutionPubSubRequest_TestDataMessage_ManualOverrideForTestDataMessage
+
+		tempManualOverrideForTestDataMessage = &fenixExecutionWorkerGrpcApi.
+			ProcessTestInstructionExecutionPubSubRequest_TestDataMessage_ManualOverrideForTestDataMessage{
+			TestDataSetAttributeUuid:  manualOverrideForTestData.TestDataSetAttributeUuid,
+			TestDataSetAttributeName:  manualOverrideForTestData.TestDataSetAttributeName,
+			TestDataSetAttributeValue: manualOverrideForTestData.TestDataSetAttributeValue,
+		}
+
+		// Append ManualOverrideForTestData to slice
+		tempManualOverrideForTestDataMessages = append(tempManualOverrideForTestDataMessages, tempManualOverrideForTestDataMessage)
+
+	}
+
+	// Add the converted ManualOverrideForTestData
+	processTestInstructionExecutionPubSubRequest.TestInstruction.TestInstructionAttributes = tempTestInstructionAttributes
 
 	// Send TestInstruction to Connector to be executed, via call-back
 	var err error

@@ -90,28 +90,32 @@ func fenixExecutionConnectorMain() {
 	var connectorIsReadyToReceiveWorkChannel chan bool
 	connectorIsReadyToReceiveWorkChannel = make(chan bool)
 
-	// 	Inform Worker that Connector is ready to receive work
-	go func() {
+	// Should there be any communication out from Connector
+	if common_config.TurnOffAllCommunicationWithWorker == false {
 
-		// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
-		// Allowed Users to Worker
-		if common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers == true {
+		// 	Inform Worker that Connector is ready to receive work
+		go func() {
 
-			// Send Supported TestInstructions, TesInstructionContainers and Allowed Users to Worker
+			// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
+			// Allowed Users to Worker
+			if common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers == true {
+
+				// Send Supported TestInstructions, TesInstructionContainers and Allowed Users to Worker
+				fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
+					SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
+			}
+
+			// Wait 5 seconds before informing Worker that Connector is ready for Work
+			time.Sleep(5 * time.Second)
+			// Inform Worker that Connector is Starting Up
 			fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
-				SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
-		}
+				ConnectorIsReadyToReceiveWork(&stopSendingAliveToWorkerTickerChannel, &connectorIsReadyToReceiveWorkChannel)
 
-		// Wait 5 seconds before informing Worker that Connector is ready for Work
-		time.Sleep(5 * time.Second)
-		// Inform Worker that Connector is Starting Up
-		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
-			ConnectorIsReadyToReceiveWork(&stopSendingAliveToWorkerTickerChannel, &connectorIsReadyToReceiveWorkChannel)
-
-	}()
+		}()
+	}
 
 	// Start up PubSub-receiver, if it should
-	if common_config.ShouldPubSubReceiverBeStarted == true {
+	if common_config.ShouldPubSubReceiverBeStarted == true && common_config.TurnOffAllCommunicationWithWorker == false {
 
 		if common_config.UsePubSubToReceiveMessagesFromWorker == true {
 

@@ -311,4 +311,13 @@ func fenixConnectorAdminSharedInit() {
 		os.Exit(0)
 	}
 
+	// Extract if All communication with Worker should be done
+	common_config.TurnOffAllCommunicationWithWorker, err = strconv.ParseBool(
+		mustGetenv("TurnOffAllCommunicationWithWorker"))
+	if err != nil {
+		fmt.Println("Couldn't convert environment variable "+
+			"'TurnOffAllCommunicationWithWorker:' to an boolean, error: ", err)
+		os.Exit(0)
+	}
+
 }

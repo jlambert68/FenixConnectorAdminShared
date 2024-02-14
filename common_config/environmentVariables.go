@@ -39,4 +39,5 @@ var (
 	UseNativeGcpPubSubClientLibrary                                                       bool
 	ForceNewBaseLineForTestInstructionsAndTestInstructionContainers                       bool
 	ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers bool
+	TurnOffAllCommunicationWithWorker                                                     bool
 )

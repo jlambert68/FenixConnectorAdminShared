@@ -21,6 +21,19 @@ func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) WorkerAr
 		"id": "fe41e598-6fdd-4c1f-86e6-463d07db4a3a",
 	}).Debug("Outgoing 'gRPCServer - WorkerAreYouAlive'")
 
+	// Don't call Worker if it is not allowed
+	if common_config.TurnOffAllCommunicationWithWorker == true {
+
+		ackNackResponseMessage := &fenixExecutionConnectorGrpcApi.AckNackResponse{
+			AckNack:                         false,
+			Comments:                        "Message to Worker is now allowed due to environment variable: 'TurnOffAllCommunicationWithWorker'=true",
+			ErrorCodes:                      nil,
+			ProtoFileVersionUsedByConnector: fenixExecutionConnectorGrpcApi.CurrentFenixExecutionConnectorProtoFileVersionEnum(common_config.GetHighestConnectorProtoFileVersion()),
+		}
+
+		return ackNackResponseMessage, nil
+	}
+
 	// Current user
 	userID := "gRPC-api doesn't support UserId"
 

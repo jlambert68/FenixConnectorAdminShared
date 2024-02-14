@@ -9,14 +9,14 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/pat v1.0.2
 	github.com/gorilla/sessions v1.2.2
-	github.com/jlambert68/FenixGrpcApi v0.0.0-20240213084421-1c455f3467f5
+	github.com/jlambert68/FenixGrpcApi v0.0.0-20240214144908-0b4d8cc91b29
 	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20240212082241-b037127f1f1f
 	github.com/markbates/goth v1.78.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/net v0.21.0
 	golang.org/x/oauth2 v0.17.0
 	google.golang.org/api v0.164.0
-	google.golang.org/grpc v1.61.0
+	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.32.0
 
 )

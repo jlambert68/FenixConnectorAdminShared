@@ -11,7 +11,10 @@ import (
 
 // AreYouAlive - *********************************************************************
 // Anyone can check if Execution Connector server is alive with this service
-func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) AreYouAlive(ctx context.Context, emptyParameter *fenixExecutionConnectorGrpcApi.EmptyParameter) (*fenixExecutionConnectorGrpcApi.AckNackResponse, error) {
+func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) AreYouAlive(
+	ctx context.Context,
+	emptyParameter *fenixExecutionConnectorGrpcApi.EmptyParameter) (
+	*fenixExecutionConnectorGrpcApi.AckNackResponse, error) {
 
 	common_config.Logger.WithFields(logrus.Fields{
 		"id": "1ff67695-9a8b-4821-811d-0ab8d33c4d8b",

@@ -24,20 +24,22 @@ func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) TriggerT
 		"id": "8fc14487-e148-473e-9711-f25399a9da5d",
 	}).Debug("Outgoing 'gRPCServer - processTestInstructionExecutionPubSubRequest'")
 
-	// Current user
-	userID := "gRPC-api doesn't support UserId"
+	/*
+		// Current user
+		userID := "gRPC-api doesn't support UserId"
 
-	// Check if Client is using correct proto files version
-	returnMessage := common_config.IsCallerUsingCorrectConnectorProtoFileVersion(
-		userID,
-		fenixExecutionConnectorGrpcApi.CurrentFenixExecutionConnectorProtoFileVersionEnum(
-			triggerProcessTestInstructionExecutionPubSubRequest.GetDomainIdentificationAnfProtoFileVersionUsedByClient().
-				GetProtoFileVersionUsedByClient()))
-	if returnMessage != nil {
+		// Check if Client is using correct proto files version
+		returnMessage := common_config.IsCallerUsingCorrectConnectorProtoFileVersion(
+			userID,
+			fenixExecutionConnectorGrpcApi.CurrentFenixExecutionConnectorProtoFileVersionEnum(
+				triggerProcessTestInstructionExecutionPubSubRequest.GetDomainIdentificationAnfProtoFileVersionUsedByClient().
+					GetProtoFileVersionUsedByClient()))
+		if returnMessage != nil {
 
-		// Exiting
-		return returnMessage, nil
-	}
+			// Exiting
+			return returnMessage, nil
+		}
+	*/
 
 	// Convert 'triggerProcessTestInstructionExecutionPubSubRequest' into 'processTestInstructionExecutionPubSubRequest'
 	var processTestInstructionExecutionPubSubRequest *fenixExecutionWorkerGrpcApi.ProcessTestInstructionExecutionPubSubRequest

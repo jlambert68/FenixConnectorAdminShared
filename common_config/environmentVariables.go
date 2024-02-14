@@ -26,7 +26,6 @@ var (
 	FenixExecutionWorkerAddressToDial                                                     string
 	ExecutionConnectorPort                                                                int
 	GCPAuthentication                                                                     bool
-	TurnOffCallToWorker                                                                   bool
 	AuthClientId                                                                          string
 	AuthClientSecret                                                                      string
 	UseServiceAccount                                                                     bool

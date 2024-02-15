@@ -1,146 +1,13 @@
 package fenixConnectorAdminShared
 
 import (
-	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
-	"github.com/sirupsen/logrus"
-	"strconv"
-	//"flag"
 	"fmt"
-	"log"
+	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixSyncShared/environmentVariables"
+	"github.com/sirupsen/logrus"
 	"os"
+	"strconv"
 )
-
-// mustGetEnv is a helper function for getting environment variables.
-// Displays a warning if the environment variable is not set.
-func mustGetenv(environmentVariableName string) string {
-
-	var environmentVariable string
-
-	if useInjectedEnvironmentVariables == "true" {
-		// Extract environment variables from parameters feed into program at compilation time
-
-		switch environmentVariableName {
-		case "AuthClientId":
-			environmentVariable = authClientId
-
-		case "AuthClientSecret":
-			environmentVariable = authClientSecret
-
-		case "CAEngineAddress":
-			environmentVariable = cAEngineAddress
-
-		case "CAEngineAddressPath":
-			environmentVariable = cAEngineAddressPath
-
-		case "ExecutionConnectorPort":
-			environmentVariable = executionConnectorPort
-
-		case "ExecutionLocationForConnector":
-			environmentVariable = executionLocationForConnector
-
-		case "ExecutionLocationForWorker":
-			environmentVariable = executionLocationForWorker
-
-		case "ExecutionWorkerAddress":
-			environmentVariable = executionWorkerAddress
-
-		case "ExecutionWorkerPort":
-			environmentVariable = executionWorkerPort
-
-		case "GCPAuthentication":
-			environmentVariable = gCPAuthentication
-
-		case "GcpProject":
-			environmentVariable = gcpProject
-
-		case "LocalServiceAccountPath":
-			environmentVariable = localServiceAccountPath
-
-		case "LoggingLevel":
-			environmentVariable = loggingLevel
-
-		case "RunInTray":
-			environmentVariable = runInTray
-
-		case "TestInstructionExecutionPubSubTopicBase":
-			environmentVariable = testInstructionExecutionPubSubTopicBase
-
-		case "ThisDomainsUuid":
-			environmentVariable = thisDomainsUuid
-
-		case "TurnOffCallToWorker":
-			environmentVariable = turnOffCallToWorker
-
-		case "UseInternalWebServerForTest":
-			environmentVariable = useInternalWebServerForTest
-
-		case "UsePubSubToReceiveMessagesFromWorker":
-			environmentVariable = usePubSubToReceiveMessagesFromWorker
-
-		case "UseServiceAccount":
-			environmentVariable = useServiceAccount
-
-		case "UseNativeGcpPubSubClientLibrary":
-			environmentVariable = useNativeGcpPubSubClientLibrary
-
-		default:
-			log.Fatalf("Warning: %s environment variable not among injected variables.\n", environmentVariableName)
-
-		}
-
-		if environmentVariable == "" {
-			log.Fatalf("Warning: %s environment variable not set.\n", environmentVariableName)
-		}
-
-	} else {
-		//
-		environmentVariable = os.Getenv(environmentVariableName)
-		if environmentVariable == "" {
-			log.Fatalf("Warning: %s environment variable not set.\n", environmentVariableName)
-		}
-
-	}
-	return environmentVariable
-}
-
-// Variables injected at compilation time
-var (
-	useInjectedEnvironmentVariables string
-
-	authClientId                            string
-	authClientSecret                        string
-	cAEngineAddress                         string
-	cAEngineAddressPath                     string
-	executionConnectorPort                  string
-	executionLocationForConnector           string
-	executionLocationForWorker              string
-	executionWorkerAddress                  string
-	executionWorkerPort                     string
-	gCPAuthentication                       string
-	gcpProject                              string
-	localServiceAccountPath                 string
-	loggingLevel                            string
-	runInTray                               string
-	testInstructionExecutionPubSubTopicBase string
-	thisDomainsUuid                         string
-	turnOffCallToWorker                     string
-	useInternalWebServerForTest             string
-	usePubSubToReceiveMessagesFromWorker    string
-	useServiceAccount                       string
-	useNativeGcpPubSubClientLibrary         string
-)
-
-func dumpMap(space string, m map[string]interface{}) {
-	for k, v := range m {
-		if mv, ok := v.(map[string]interface{}); ok {
-			fmt.Printf("{ \"%v\": \n", k)
-			dumpMap(space+"\t", mv)
-			fmt.Printf("}\n")
-		} else {
-			fmt.Printf("%v %v : %v\n", space, k, v)
-		}
-	}
-}
 
 func fenixConnectorAdminSharedInit() {
 	//executionLocationForConnector := flag.String("startupType", "0", "The application should be started with one of the following: LOCALHOST_NODOCKER, LOCALHOST_DOCKER, GCP")
@@ -149,7 +16,8 @@ func fenixConnectorAdminSharedInit() {
 	var err error
 
 	// Get Environment variable to tell how/were this worker is  running
-	var executionLocationForConnector = mustGetenv("ExecutionLocationForConnector")
+	var executionLocationForConnector = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ExecutionLocationForConnector")
 
 	switch executionLocationForConnector {
 	case "LOCALHOST_NODOCKER":
@@ -168,7 +36,8 @@ func fenixConnectorAdminSharedInit() {
 	}
 
 	// Get Environment variable to tell were Fenix Execution Server is running
-	var executionLocationForExecutionWorker = mustGetenv("ExecutionLocationForWorker")
+	var executionLocationForExecutionWorker = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ExecutionLocationForWorker")
 
 	switch executionLocationForExecutionWorker {
 	case "LOCALHOST_NODOCKER":
@@ -187,10 +56,12 @@ func fenixConnectorAdminSharedInit() {
 	}
 
 	// Address to Fenix Execution Worker Server
-	common_config.FenixExecutionWorkerAddress = mustGetenv("ExecutionWorkerAddress")
+	common_config.FenixExecutionWorkerAddress = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ExecutionWorkerAddress")
 
 	// Port for Fenix Execution Worker Server
-	common_config.FenixExecutionWorkerPort, err = strconv.Atoi(mustGetenv("ExecutionWorkerPort"))
+	common_config.FenixExecutionWorkerPort, err = strconv.Atoi(environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ExecutionWorkerPort"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable 'ExecutionWorkerPort' to an integer, error: ", err)
 		os.Exit(0)
@@ -198,7 +69,8 @@ func fenixConnectorAdminSharedInit() {
 	}
 
 	// Port for Fenix Execution Connector Server
-	common_config.ExecutionConnectorPort, err = strconv.Atoi(mustGetenv("ExecutionConnectorPort"))
+	common_config.ExecutionConnectorPort, err = strconv.Atoi(environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ExecutionConnectorPort"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable 'executionConnectorPort' to an integer, error: ", err)
 		os.Exit(0)
@@ -209,7 +81,8 @@ func fenixConnectorAdminSharedInit() {
 	common_config.FenixExecutionWorkerAddressToDial = common_config.FenixExecutionWorkerAddress + ":" + strconv.Itoa(common_config.FenixExecutionWorkerPort)
 
 	// Extract Debug level
-	var loggingLevel = mustGetenv("LoggingLevel")
+	var loggingLevel = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("LoggingLevel")
 
 	switch loggingLevel {
 
@@ -226,7 +99,8 @@ func fenixConnectorAdminSharedInit() {
 	}
 
 	// Extract if there is a need for authentication when going toward GCP
-	boolValue, err := strconv.ParseBool(mustGetenv("GCPAuthentication"))
+	boolValue, err := strconv.ParseBool(environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("GCPAuthentication"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable 'GCPAuthentication:' to an boolean, error: ", err)
 		os.Exit(0)
@@ -234,7 +108,8 @@ func fenixConnectorAdminSharedInit() {
 	common_config.GCPAuthentication = boolValue
 
 	// Extract if Service Account should be used towards GCP or should the user log in via web
-	boolValue, err = strconv.ParseBool(mustGetenv("UseServiceAccount"))
+	boolValue, err = strconv.ParseBool(environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("UseServiceAccount"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable 'UseServiceAccount:' to an boolean, error: ", err)
 		os.Exit(0)
@@ -242,23 +117,28 @@ func fenixConnectorAdminSharedInit() {
 	common_config.UseServiceAccount = boolValue
 
 	// Extract OAuth 2.0 Client ID
-	common_config.AuthClientId = mustGetenv("AuthClientId")
+	common_config.AuthClientId = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("AuthClientId")
 
 	// Extract OAuth 2.0 Client Secret
-	common_config.AuthClientSecret = mustGetenv("AuthClientSecret")
+	common_config.AuthClientSecret = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("AuthClientSecret")
 
 	// Extract the GCP-project
-	common_config.GcpProject = mustGetenv("GcpProject")
+	common_config.GcpProject = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("GcpProject")
 
 	// Extract if PubSub should be used to receive messages from Worker
-	common_config.UsePubSubToReceiveMessagesFromWorker, err = strconv.ParseBool(mustGetenv("UsePubSubToReceiveMessagesFromWorker"))
+	common_config.UsePubSubToReceiveMessagesFromWorker, err = strconv.ParseBool(environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("UsePubSubToReceiveMessagesFromWorker"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable 'UsePubSubToReceiveMessagesFromWorker:' to an boolean, error: ", err)
 		os.Exit(0)
 	}
 
 	// Extract the LocalServiceAccountPath
-	common_config.LocalServiceAccountPath = mustGetenv("LocalServiceAccountPath")
+	common_config.LocalServiceAccountPath = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("LocalServiceAccountPath")
 	// The only way have an OK space is to replace an existing character
 	if common_config.LocalServiceAccountPath == "#" {
 		common_config.LocalServiceAccountPath = ""
@@ -268,16 +148,20 @@ func fenixConnectorAdminSharedInit() {
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", common_config.LocalServiceAccountPath)
 
 	// Extract environment variable for 'TestInstructionExecutionPubSubTopicBase'
-	common_config.TestInstructionExecutionPubSubTopicBase = mustGetenv("TestInstructionExecutionPubSubTopicBase")
+	common_config.TestInstructionExecutionPubSubTopicBase = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("TestInstructionExecutionPubSubTopicBase")
 
 	// Extract environment variable for 'ThisDomainsUuid'
-	common_config.ThisDomainsUuid = mustGetenv("ThisDomainsUuid")
+	common_config.ThisDomainsUuid = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ThisDomainsUuid")
 
 	// Extract environment variable for 'ThisExecutionDomainUuid'
-	common_config.ThisExecutionDomainUuid = mustGetenv("ThisExecutionDomainUuid")
+	common_config.ThisExecutionDomainUuid = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ThisExecutionDomainUuid")
 
 	// Extract if native pubsub client library should be used or not
-	common_config.UseNativeGcpPubSubClientLibrary, err = strconv.ParseBool(mustGetenv("UseNativeGcpPubSubClientLibrary"))
+	common_config.UseNativeGcpPubSubClientLibrary, err = strconv.ParseBool(environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("UseNativeGcpPubSubClientLibrary"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable 'UseNativeGcpPubSubClientLibrary:' to an boolean, error: ", err)
 		os.Exit(0)
@@ -285,7 +169,8 @@ func fenixConnectorAdminSharedInit() {
 
 	// Extract if a New Baseline for TestInstructions, TestInstructionContainers and Users should be saved in database
 	common_config.ForceNewBaseLineForTestInstructionsAndTestInstructionContainers, err = strconv.ParseBool(
-		mustGetenv("ForceNewBaseLineForTestInstructionsAndTestInstructionContainers"))
+		environmentVariables.
+			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ForceNewBaseLineForTestInstructionsAndTestInstructionContainers"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable "+
 			"'ForceNewBaseLineForTestInstructionsAndTestInstructionContainers:' to an boolean, error: ", err)
@@ -295,7 +180,8 @@ func fenixConnectorAdminSharedInit() {
 	// Extract if this is the Connector that sends supported TestInstructions, TestInstructionContainers and
 	// Users to Worker. If not, then this is only a TestExecutionDomain
 	common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers, err = strconv.ParseBool(
-		mustGetenv("ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers"))
+		environmentVariables.
+			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable "+
 			"'ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers:' to an boolean, error: ", err)
@@ -304,7 +190,8 @@ func fenixConnectorAdminSharedInit() {
 
 	// Extract if PubSubReceiver be started
 	common_config.ShouldPubSubReceiverBeStarted, err = strconv.ParseBool(
-		mustGetenv("ShouldPubSubReceiverBeStarted"))
+		environmentVariables.
+			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ShouldPubSubReceiverBeStarted"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable "+
 			"'ShouldPubSubReceiverBeStarted:' to an boolean, error: ", err)
@@ -313,7 +200,8 @@ func fenixConnectorAdminSharedInit() {
 
 	// Extract if All communication with Worker should be done
 	common_config.TurnOffAllCommunicationWithWorker, err = strconv.ParseBool(
-		mustGetenv("TurnOffAllCommunicationWithWorker"))
+		environmentVariables.
+			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("TurnOffAllCommunicationWithWorker"))
 	if err != nil {
 		fmt.Println("Couldn't convert environment variable "+
 			"'TurnOffAllCommunicationWithWorker:' to an boolean, error: ", err)

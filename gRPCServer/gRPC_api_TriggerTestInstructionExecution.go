@@ -59,8 +59,8 @@ func (fenixConnectorGrpcObject *FenixConnectorGrpcServicesServerStruct) TriggerT
 				GetTestInstructionExecutionUuid(),
 			TestInstructionExecutionVersion: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
 				TestInstructionExecutionVersion,
-			TestInstructionUuid: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
-				GetTestInstructionUuid(),
+			TestInstructionOriginalUuid: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
+				GetTestInstructionOriginalUuid(),
 			TestInstructionName: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().
 				GetTestInstructionName(),
 			MajorVersionNumber: triggerProcessTestInstructionExecutionPubSubRequest.GetTestInstruction().

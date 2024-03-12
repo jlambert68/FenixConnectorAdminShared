@@ -58,7 +58,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 
 		// Add Access token
 		ctx, returnMessageAckNack, _ = gcp.Gcp.GenerateGCPAccessToken(
-			ctx, gcp.GenerateTokenForGrpcTowardsExecutionWorker)
+			ctx, gcp.GetTokenForGrpcAndPubSub)
 		if returnMessageAckNack == false {
 			return err
 		}

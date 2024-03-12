@@ -68,7 +68,7 @@ func PullPubSubTestInstructionExecutionMessages(accessTokenReceivedChannelPtr *c
 
 		// When Connector is NOT running in GCP
 		if common_config.ExecutionLocationForConnector != common_config.GCP {
-			ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GenerateTokenForPubSub) //gcp.GetTokenFromWorkerForPubSub) //gcp.GenerateTokenForPubSub)
+			ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GetTokenForGrpcAndPubSub) //gcp.GetTokenFromWorkerForPubSub) //gcp.GenerateTokenForPubSub)
 			if returnMessageAckNack == false {
 
 				common_config.Logger.WithFields(logrus.Fields{

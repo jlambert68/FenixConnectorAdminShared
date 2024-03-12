@@ -113,7 +113,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 		common_config.GCPAuthentication == true {
 
 		// Add Access token
-		ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GenerateTokenForGrpcTowardsExecutionWorker)
+		ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GetTokenForGrpcAndPubSub)
 		if returnMessageAckNack == false {
 			common_config.Logger.WithFields(logrus.Fields{
 				"ID":                  "0b2d4659-9078-4c24-93b3-40cd5f213f98",

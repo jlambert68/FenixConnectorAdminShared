@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/pat"
 	"github.com/gorilla/sessions"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	fenixSyncShared "github.com/jlambert68/FenixSyncShared"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"
@@ -35,9 +36,10 @@ const (
 	GetTokenForGrpcAndPubSub
 )
 
-func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
+// Key for NewCookieStore
+var tempKeyAsHash string
 
-	tokenTarget = GetTokenForGrpcAndPubSub
+func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
@@ -308,12 +310,11 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 
 }
 
-var tempUuid string
-
 func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
-	if len(tempUuid) == 0 {
-		tempUuid = uuidGenerator.New().String()
+	// Set Key for NewCookieStore
+	if len(tempKeyAsHash) == 0 {
+		tempKeyAsHash = fenixSyncShared.HashSingleValue(uuidGenerator.New().String())
 	}
 
 	// Secure that User is initiated
@@ -376,7 +377,7 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx co
 
 	// Need to create a new ID-token
 
-	key := tempUuid      // Replace with your SESSION_SECRET or similar
+	key := tempKeyAsHash // Replace with your SESSION_SECRET or similar
 	maxAge := 86400 * 30 // 30 days
 	isProd := false      // Set to true when serving over https
 

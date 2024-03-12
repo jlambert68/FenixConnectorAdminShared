@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	uuidGenerator "github.com/google/uuid"
 	"github.com/gorilla/pat"
 	"github.com/gorilla/sessions"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
@@ -35,6 +36,8 @@ const (
 )
 
 func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
+
+	tokenTarget = GetTokenForGrpcAndPubSub
 
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
@@ -305,7 +308,13 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 
 }
 
+var tempUuid string
+
 func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
+
+	if len(tempUuid) == 0 {
+		tempUuid = uuidGenerator.New().String()
+	}
 
 	// Secure that User is initiated
 	gcp.initiateUserObjectPubSub()
@@ -367,9 +376,9 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx co
 
 	// Need to create a new ID-token
 
-	key := common_config.ApplicationRunTimeUuid // Replace with your SESSION_SECRET or similar
-	maxAge := 86400 * 30                        // 30 days
-	isProd := false                             // Set to true when serving over https
+	key := tempUuid      // Replace with your SESSION_SECRET or similar
+	maxAge := 86400 * 30 // 30 days
+	isProd := false      // Set to true when serving over https
 
 	store := sessions.NewCookieStore([]byte(key))
 	store.MaxAge(maxAge)

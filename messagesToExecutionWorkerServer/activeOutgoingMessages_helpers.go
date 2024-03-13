@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/jlambert68/FenixConnectorAdminShared/grpcurl"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
@@ -41,8 +42,35 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SetConnect
 
 			if common_config.ExecutionLocationForConnector == common_config.LocalhostNoDocker {
 				// Connector runs Locally
-				ctx, newGrpcClientConnection = dialFromGrpcurl(ctx)
-				remoteFenixExecutionWorkerServerConnection = newGrpcClientConnection
+
+				//ctx, newGrpcClientConnection = dialFromGrpcurl(ctx)
+				// remoteFenixExecutionWorkerServerConnection = newGrpcClientConnection
+
+				// Should ProxyServer be used for outgoing connections
+				if common_config.ShouldProxyServerBeUsed == true {
+					// Use Proxy
+					remoteFenixExecutionWorkerServerConnection, err = gcp.GRPCDialer(
+						"",
+						common_config.FenixExecutionWorkerAddressToDial,
+						common_config.FenixExecutionWorkerPort)
+
+					if err != nil {
+						common_config.Logger.WithFields(logrus.Fields{
+							"ID":                 "bdd58a11-e197-4c12-ae8a-736ce5b75761",
+							"error message":      err,
+							"dialAttemptCounter": dialAttemptCounter,
+						}).Error("Couldn't generate gRPC-connection to GuiExecutionServer via Proxy Server")
+						continue
+					}
+
+				} else {
+					// Don't use Proxy
+					ctx, newGrpcClientConnection = dialFromGrpcurl(ctx)
+					remoteFenixExecutionWorkerServerConnection = newGrpcClientConnection
+					//remoteFenixExecutionWorkerServerConnection, err = grpc.Dial(common_config.FenixExecutionWorkerAddressToDial, opts...)
+
+				}
+
 			} else {
 				// Connector runs on GCP
 				creds := credentials.NewTLS(&tls.Config{

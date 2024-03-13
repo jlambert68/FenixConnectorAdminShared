@@ -40,4 +40,12 @@ var (
 	ForceNewBaseLineForTestInstructionsAndTestInstructionContainers                       bool
 	ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers bool
 	TurnOffAllCommunicationWithWorker                                                     bool
+
+	// ShouldProxyServerBeUsed
+	// Should Proxy-server be used for outgoing requests
+	ShouldProxyServerBeUsed bool
+
+	// ProxyServerURL
+	// URL to Proxy-server for outgoing requests
+	ProxyServerURL string
 )

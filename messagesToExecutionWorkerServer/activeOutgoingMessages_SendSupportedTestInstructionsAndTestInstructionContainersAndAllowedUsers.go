@@ -30,6 +30,12 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.TestInstructionsAndTestInstructionsContainersStruct
 	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
 
+	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
+	// Allowed Users to Worker. If not then just exit
+	if common_config.ThisConnectorIsTheOneThatPublishSupportedTestInstructionsAndTestInstructionContainers == false {
+		return
+	}
+
 	// Make override on if a New Baseline should be saved in database for
 	// TestInstructions, TestInstructionContainers and Allowed Users if environment variable is set
 	if common_config.ForceNewBaseLineForTestInstructionsAndTestInstructionContainers == true {

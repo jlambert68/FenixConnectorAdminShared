@@ -29,7 +29,8 @@ type ConnectorCallBackFunctionsStruct struct {
 	// Generates the 'SupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers' that will be sent via gRPC to Worker
 	GenerateSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers func() (
 		supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.
-			TestInstructionsAndTestInstructionsContainersStruct)
+			TestInstructionsAndTestInstructionsContainersStruct,
+	)
 }
 
 // ConnectorFunctionsToDoCallBackOn

@@ -48,7 +48,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 	}()
 
 	// Only add access token when run on GCP
-	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP && common_config.GCPAuthentication == true {
+	if common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP &&
+		common_config.GCPAuthentication == true {
 
 		// Add Access token
 		ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GetTokenForGrpcAndPubSub)
@@ -68,9 +69,15 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 	numberOfgRPCCallAttempts = len(sleepTimeBetweenGrpcCallAttempts)
 	gRPCCallAttemptCounter = 0
 
+	// Creates a new temporary client only to be used for this call
+	var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
+	tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
+		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
+
 	for {
 
-		returnMessage, err := fenixExecutionWorkerGrpcClient.ConnectorProcessTestInstructionExecutionResponse(ctx, processTestInstructionExecutionResponse)
+		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.
+			ConnectorProcessTestInstructionExecutionResponse(ctx, processTestInstructionExecutionResponse)
 
 		// Add to counter for how many gRPC-call-attempts to Worker that have been done
 		gRPCCallAttemptCounter = gRPCCallAttemptCounter + 1

@@ -75,8 +75,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
 
 	var connectorIsReadyResponseMessage *fenixExecutionWorkerGrpcApi.ConnectorIsReadyResponseMessage
-	connectorIsReadyResponseMessage, err = tempFenixExecutionWorkerConnectorGrpcServicesClient.ConnectorInformsItIsAlive(
-		ctx, connectorIsReadyMessage)
+	connectorIsReadyResponseMessage, err = tempFenixExecutionWorkerConnectorGrpcServicesClient.
+		ConnectorInformsItIsAlive(ctx, connectorIsReadyMessage)
 
 	// Shouldn't happen
 	if err != nil {

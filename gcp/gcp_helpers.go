@@ -727,13 +727,13 @@ func (gcp *GcpObjectStruct) startLocalWebServer(webServer *http.Server, url stri
 	}
 
 	// Kill the process before leave
-	defer func() {
-		if err := cmd.Process.Kill(); err != nil {
-			panic(err)
-		}
+	//	defer func() {
+	//		if err := cmd.Process.Kill(); err != nil {
+	//			panic(err)
+	//		}
 
-		fmt.Println("Chrome process killed")
-	}()
+	//		fmt.Println("Chrome process killed")
+	//	}()
 
 	err = webServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {

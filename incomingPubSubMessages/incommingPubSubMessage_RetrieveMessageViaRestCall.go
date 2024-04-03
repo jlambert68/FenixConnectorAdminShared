@@ -15,7 +15,7 @@ import (
 const (
 	googlePubSubPullURL         = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:pull"
 	googlePubSubPullAckURL      = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:acknowledge"
-	googleProlongAckDeadlineURL = "https://pubsub.googleapis.com/v1/projects/{project-id}/subscriptions/{subscription-name}:modifyAckDeadline"
+	googleProlongAckDeadlineURL = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:modifyAckDeadline"
 	numberOfMessagesToBePulled  = 10
 )
 

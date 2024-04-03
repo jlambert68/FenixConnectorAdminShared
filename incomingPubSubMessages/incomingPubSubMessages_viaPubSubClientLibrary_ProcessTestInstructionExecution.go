@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/option"
@@ -79,7 +80,29 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 			grpc.WithTransportCredentials(creds),
 		}
 
-		pubSubClient, err = pubsub.NewClient(ctx, projectID, option.WithGRPCDialOption(opts[0]))
+		// Should ProxyServer be used for outgoing connections
+		if common_config.ShouldProxyServerBeUsed == true {
+			// Use Proxy
+			remoteFenixExecutionWorkerServerConnection, err := gcp.GRPCDialer(
+				"",
+				common_config.FenixExecutionWorkerAddressToDial,
+				common_config.FenixExecutionWorkerPort)
+
+			if err != nil {
+				common_config.Logger.WithFields(logrus.Fields{
+					"ID":            "a94c46ba-87df-4595-96d5-e4d144f7bc2c",
+					"error message": err,
+				}).Error("Couldn't generate connection to PubSub-server via Proxy Server")
+
+				return
+			}
+
+			pubSubClient, err = pubsub.NewClient(ctx, projectID, option.WithGRPCConn(remoteFenixExecutionWorkerServerConnection))
+
+		} else {
+
+			pubSubClient, err = pubsub.NewClient(ctx, projectID, option.WithGRPCDialOption(opts[0]))
+		}
 
 	}
 

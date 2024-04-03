@@ -51,7 +51,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SetConnect
 					// Use Proxy
 					remoteFenixExecutionWorkerServerConnection, err = gcp.GRPCDialer(
 						"",
-						common_config.FenixExecutionWorkerAddressToDial,
+						common_config.FenixExecutionWorkerAddress,
 						common_config.FenixExecutionWorkerPort)
 
 					if err != nil {

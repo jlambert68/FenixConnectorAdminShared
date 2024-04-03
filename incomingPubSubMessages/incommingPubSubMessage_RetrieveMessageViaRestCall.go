@@ -9,12 +9,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 const (
-	googlePubSubPullURL        = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:pull"
-	googlePubSubPullAckURL     = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:acknowledge"
-	numberOfMessagesToBePulled = 10
+	googlePubSubPullURL         = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:pull"
+	googlePubSubPullAckURL      = "https://pubsub.googleapis.com/v1/projects/%s/subscriptions/%s:acknowledge"
+	googleProlongAckDeadlineURL = "https://pubsub.googleapis.com/v1/projects/{project-id}/subscriptions/{subscription-name}:modifyAckDeadline"
+	numberOfMessagesToBePulled  = 10
 )
 
 // The Pubsub-Pull Request
@@ -101,7 +103,54 @@ func retrievePubSubMessagesViaRestApi(subscriptionID string, oauth2Token string)
 
 		// Trigger TestInstruction in parallel while processing next message
 		go func() {
+
+			// Channel to signal when message processing is done
+			doneProcessing := make(chan bool)
+
+			// Start a goroutine to extend the ack deadline
+			go func() {
+				ticker := time.NewTicker(25 * time.Second)
+				defer ticker.Stop()
+
+				for {
+					select {
+					case <-ticker.C:
+						// Extend the deadline by 30 seconds
+						var modifyAckDeadlineRequestBody *modifyAckDeadlineRequest
+						modifyAckDeadlineRequestBody = &modifyAckDeadlineRequest{
+							AckIds:             []string{message.AckID},
+							AckDeadlineSeconds: 30,
+						}
+
+						// Perform the update
+						err = prolongAckDeadlineViaRestApi(
+							common_config.GcpProject,
+							subscriptionID,
+							message.AckID,
+							oauth2Token,
+							modifyAckDeadlineRequestBody)
+
+						if err != nil {
+
+							common_config.Logger.WithFields(logrus.Fields{
+								"ID":  "a396a891-d956-4d67-92f1-94cd47379a47",
+								"err": err.Error(),
+							}).Error("Couldn't update 'AckDeadline'")
+
+							return
+						}
+
+					case <-doneProcessing:
+						return
+					}
+				}
+			}()
+
 			err = triggerProcessTestInstructionExecution(message.Message.Data)
+
+			// stop prolonging of 'AckDeadline'
+			doneProcessing <- true
+
 			if err == nil {
 
 				// Acknowledge the message
@@ -142,6 +191,11 @@ type ackRequest struct {
 	AckIds []string `json:"ackIds"`
 }
 
+type modifyAckDeadlineRequest struct {
+	AckIds             []string `json:"ackIds"`
+	AckDeadlineSeconds int      `json:"ackDeadlineSeconds"`
+}
+
 // Send Acknowledge for one message, which was Pulled and execution was successful
 func sendAcknowledgeMessageViaRestApi(projectID string, subscriptionID string, ackID string, oauth2Token string) error {
 	url := fmt.Sprintf(googlePubSubPullAckURL, projectID, subscriptionID)
@@ -153,6 +207,35 @@ func sendAcknowledgeMessageViaRestApi(projectID string, subscriptionID string, a
 
 	// Prepare Acknowledge Message
 	bodyBytes, _ := json.Marshal(ackRequestBody)
+	var acknowledgeRequest *http.Request
+	acknowledgeRequest, _ = http.NewRequest("POST", url, bytes.NewBuffer(bodyBytes))
+	acknowledgeRequest.Header.Set("Authorization", "Bearer "+oauth2Token)
+	acknowledgeRequest.Header.Set("Content-Type", "application/json")
+
+	// Send Acknowledge Request
+	var client *http.Client
+	client = &http.Client{}
+	resp, err := client.Do(acknowledgeRequest)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("Error: %s - %s", resp.Status, string(bodyBytes))
+	}
+
+	return nil
+}
+
+// Prolong the AckDeadline time for a specific Message
+func prolongAckDeadlineViaRestApi(projectID string, subscriptionID string, ackID string, oauth2Token string,
+	modifyAckDeadlineRequestBody *modifyAckDeadlineRequest) error {
+	url := fmt.Sprintf(googleProlongAckDeadlineURL, projectID, subscriptionID)
+
+	// Prolong AckDeadline Message
+	bodyBytes, _ := json.Marshal(modifyAckDeadlineRequestBody)
 	var acknowledgeRequest *http.Request
 	acknowledgeRequest, _ = http.NewRequest("POST", url, bytes.NewBuffer(bodyBytes))
 	acknowledgeRequest.Header.Set("Authorization", "Bearer "+oauth2Token)

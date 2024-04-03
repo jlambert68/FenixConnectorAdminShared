@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/protobuf/encoding/protojson"
 	"strings"
+	"time"
 )
 
 // PullPubSubTestInstructionExecutionMessagesGcpClientLib
@@ -141,10 +142,45 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 		// Trigger TestInstruction in parallel while processing next message
 		go func() {
 
-		}()
+			// Channel to signal when message processing is done
+			doneProcessing := make(chan bool)
 
-		go func() {
+			// Start a goroutine to extend the ack deadline
+			go func() {
+				ticker := time.NewTicker(25 * time.Second)
+				defer ticker.Stop()
+
+				for {
+					select {
+					case <-ticker.C:
+						// Extend the deadline by 30 seconds
+						subConfigToUpdate := pubsub.SubscriptionConfigToUpdate{
+							AckDeadline: 30 * time.Second, // changing the ack deadline
+						}
+
+						// Perform the update
+						_, err = clientSubscription.Update(ctx, subConfigToUpdate)
+						if err != nil {
+
+							common_config.Logger.WithFields(logrus.Fields{
+								"ID":                 "476cc867-8fc7-40ef-85c7-fc959d397003",
+								"pubSubMessage.Data": string(pubSubMessage.Data),
+							}).Error("Couldn't update 'AckDeadline'")
+
+							return
+						}
+
+					case <-doneProcessing:
+						return
+					}
+				}
+			}()
+
 			err = triggerProcessTestInstructionExecution(pubSubMessage.Data)
+
+			// stop prolonging of 'AckDeadline'
+			doneProcessing <- true
+
 			if err == nil {
 
 				// Acknowledge the message

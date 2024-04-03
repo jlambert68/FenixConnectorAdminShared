@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
@@ -50,6 +51,9 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 	var pubSubClient *pubsub.Client
 	var err error
 	var opts []grpc.DialOption
+	var appendedCtx context.Context
+	var returnAckNack bool
+	var returnMessage string
 
 	ctx := context.Background()
 
@@ -97,7 +101,13 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 				return
 			}
 
-			pubSubClient, err = pubsub.NewClient(ctx, projectID, option.WithGRPCConn(remoteFenixExecutionWorkerServerConnection))
+			appendedCtx, returnAckNack, returnMessage = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GetTokenForGrpcAndPubSub)
+			if returnAckNack == false {
+				err = errors.New(returnMessage)
+				return
+			}
+
+			pubSubClient, err = pubsub.NewClient(appendedCtx, projectID, option.WithGRPCConn(remoteFenixExecutionWorkerServerConnection))
 
 		} else {
 

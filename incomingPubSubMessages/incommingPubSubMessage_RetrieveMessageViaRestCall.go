@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 const (
@@ -104,74 +103,79 @@ func retrievePubSubMessagesViaRestApi(subscriptionID string, oauth2Token string)
 		// Trigger TestInstruction in parallel while processing next message
 		go func() {
 
-			// Channel to signal when message processing is done
-			doneProcessing := make(chan bool)
+			/*
+				// Channel to signal when message processing is done
+				doneProcessing := make(chan bool)
 
-			// Start a goroutine to extend the ack deadline
-			go func() {
-				ticker := time.NewTicker(25 * time.Second)
-				defer ticker.Stop()
+				// Start a goroutine to extend the ack deadline
+				go func() {
+					ticker := time.NewTicker(25 * time.Second)
+					defer ticker.Stop()
 
-				for {
-					select {
-					case <-ticker.C:
-						// Extend the deadline by 30 seconds
-						var modifyAckDeadlineRequestBody *modifyAckDeadlineRequest
-						modifyAckDeadlineRequestBody = &modifyAckDeadlineRequest{
-							AckIds:             []string{message.AckID},
-							AckDeadlineSeconds: 30,
-						}
+					for {
+						select {
+						case <-ticker.C:
+							// Extend the deadline by 30 seconds
+							var modifyAckDeadlineRequestBody *modifyAckDeadlineRequest
+							modifyAckDeadlineRequestBody = &modifyAckDeadlineRequest{
+								AckIds:             []string{message.AckID},
+								AckDeadlineSeconds: 30,
+							}
 
-						// Perform the update
-						err = prolongAckDeadlineViaRestApi(
-							common_config.GcpProject,
-							subscriptionID,
-							message.AckID,
-							oauth2Token,
-							modifyAckDeadlineRequestBody)
+							// Perform the update
+							err = prolongAckDeadlineViaRestApi(
+								common_config.GcpProject,
+								subscriptionID,
+								message.AckID,
+								oauth2Token,
+								modifyAckDeadlineRequestBody)
 
-						if err != nil {
+							if err != nil {
 
-							common_config.Logger.WithFields(logrus.Fields{
-								"ID":  "a396a891-d956-4d67-92f1-94cd47379a47",
-								"err": err.Error(),
-							}).Error("Couldn't update 'AckDeadline'")
+								common_config.Logger.WithFields(logrus.Fields{
+									"ID":  "a396a891-d956-4d67-92f1-94cd47379a47",
+									"err": err.Error(),
+								}).Error("Couldn't update 'AckDeadline'")
 
+								return
+							}
+
+						case <-doneProcessing:
 							return
 						}
-
-					case <-doneProcessing:
-						return
 					}
-				}
-			}()
+				}()
+
+			*/
+
+			// Acknowledge the message
+			// Send 'Ack' back to PubSub-system that message has taken care of, even without a successful execution
+			err = sendAcknowledgeMessageViaRestApi(common_config.GcpProject, subscriptionID, message.AckID, oauth2Token)
+
+			if err != nil {
+
+				common_config.Logger.WithFields(logrus.Fields{
+					"ID":            "439247e2-27d8-4451-9ad0-51c0d60e3dd8",
+					"message.AckID": message.AckID,
+					"err":           err,
+				}).Error("Failed to acknowledge message")
+
+			} else {
+
+				common_config.Logger.WithFields(logrus.Fields{
+					"ID":            "54aebdf9-888d-4e0a-911c-e6cf9165acba",
+					"message.AckID": message.AckID,
+				}).Debug("Success in Acknowledged message")
+
+			}
 
 			err = triggerProcessTestInstructionExecution(message.Message.Data)
 
 			// stop prolonging of 'AckDeadline'
-			doneProcessing <- true
+			//doneProcessing <- true
 
 			if err == nil {
 
-				// Acknowledge the message
-				err = sendAcknowledgeMessageViaRestApi(common_config.GcpProject, subscriptionID, message.AckID, oauth2Token)
-
-				if err != nil {
-
-					common_config.Logger.WithFields(logrus.Fields{
-						"ID":            "439247e2-27d8-4451-9ad0-51c0d60e3dd8",
-						"message.AckID": message.AckID,
-						"err":           err,
-					}).Error("Failed to acknowledge message")
-
-				} else {
-
-					common_config.Logger.WithFields(logrus.Fields{
-						"ID":            "54aebdf9-888d-4e0a-911c-e6cf9165acba",
-						"message.AckID": message.AckID,
-					}).Debug("Success in Acknowledged message")
-
-				}
 			} else {
 
 				common_config.Logger.WithFields(logrus.Fields{

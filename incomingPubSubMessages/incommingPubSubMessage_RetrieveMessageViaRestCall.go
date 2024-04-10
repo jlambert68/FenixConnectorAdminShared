@@ -95,95 +95,44 @@ func retrievePubSubMessagesViaRestApi(subscriptionID string, oauth2Token string)
 	for _, message := range response.ReceivedMessages {
 
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":      "28ac438d-81bd-4590-bc08-bb02cf2b98af",
-			"message": string(message.Message.Data),
-			"err":     err,
+			"ID":                             "28ac438d-81bd-4590-bc08-bb02cf2b98af",
+			"message":                        string(message.Message.Data),
+			"numberOfMessagesInPullResponse": numberOfMessagesInPullResponse,
 		}).Debug("Received message")
 
-		// Trigger TestInstruction in parallel while processing next message
-		go func() {
+		// Acknowledge the message
+		// Send 'Ack' back to PubSub-system that message has taken care of, even without a successful execution
+		err = sendAcknowledgeMessageViaRestApi(common_config.GcpProject, subscriptionID, message.AckID, oauth2Token)
 
-			/*
-				// Channel to signal when message processing is done
-				doneProcessing := make(chan bool)
+		if err != nil {
 
-				// Start a goroutine to extend the ack deadline
-				go func() {
-					ticker := time.NewTicker(25 * time.Second)
-					defer ticker.Stop()
+			common_config.Logger.WithFields(logrus.Fields{
+				"ID":            "439247e2-27d8-4451-9ad0-51c0d60e3dd8",
+				"message.AckID": message.AckID,
+				"err":           err,
+			}).Error("Failed to acknowledge message")
 
-					for {
-						select {
-						case <-ticker.C:
-							// Extend the deadline by 30 seconds
-							var modifyAckDeadlineRequestBody *modifyAckDeadlineRequest
-							modifyAckDeadlineRequestBody = &modifyAckDeadlineRequest{
-								AckIds:             []string{message.AckID},
-								AckDeadlineSeconds: 30,
-							}
+		} else {
 
-							// Perform the update
-							err = prolongAckDeadlineViaRestApi(
-								common_config.GcpProject,
-								subscriptionID,
-								message.AckID,
-								oauth2Token,
-								modifyAckDeadlineRequestBody)
+			common_config.Logger.WithFields(logrus.Fields{
+				"ID":            "54aebdf9-888d-4e0a-911c-e6cf9165acba",
+				"message.AckID": message.AckID,
+			}).Debug("Success in Acknowledged message")
 
-							if err != nil {
+			// Trigger TestInstruction in parallel while processing next message
+			go func() {
 
-								common_config.Logger.WithFields(logrus.Fields{
-									"ID":  "a396a891-d956-4d67-92f1-94cd47379a47",
-									"err": err.Error(),
-								}).Error("Couldn't update 'AckDeadline'")
+				err = triggerProcessTestInstructionExecution(message.Message.Data)
 
-								return
-							}
+				if err != nil {
 
-						case <-doneProcessing:
-							return
-						}
-					}
-				}()
+					common_config.Logger.WithFields(logrus.Fields{
+						"ID": "657fd8b2-2d9b-4158-8dbb-9f12668b94b2",
+					}).Error("Failed to Process TestInstructionExecution and Message could be lost")
 
-			*/
-
-			// Acknowledge the message
-			// Send 'Ack' back to PubSub-system that message has taken care of, even without a successful execution
-			err = sendAcknowledgeMessageViaRestApi(common_config.GcpProject, subscriptionID, message.AckID, oauth2Token)
-
-			if err != nil {
-
-				common_config.Logger.WithFields(logrus.Fields{
-					"ID":            "439247e2-27d8-4451-9ad0-51c0d60e3dd8",
-					"message.AckID": message.AckID,
-					"err":           err,
-				}).Error("Failed to acknowledge message")
-
-			} else {
-
-				common_config.Logger.WithFields(logrus.Fields{
-					"ID":            "54aebdf9-888d-4e0a-911c-e6cf9165acba",
-					"message.AckID": message.AckID,
-				}).Debug("Success in Acknowledged message")
-
-			}
-
-			err = triggerProcessTestInstructionExecution(message.Message.Data)
-
-			// stop prolonging of 'AckDeadline'
-			//doneProcessing <- true
-
-			if err == nil {
-
-			} else {
-
-				common_config.Logger.WithFields(logrus.Fields{
-					"ID": "657fd8b2-2d9b-4158-8dbb-9f12668b94b2",
-				}).Error("Failed to Process TestInstructionExecution")
-
-			}
-		}()
+				}
+			}()
+		}
 
 	}
 

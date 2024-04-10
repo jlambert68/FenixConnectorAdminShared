@@ -140,6 +140,27 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 			"ID": "8e75e797-7d75-45fa-93b2-1190c48dd0af",
 		}).Debug(fmt.Printf("Got message: %q", string(pubSubMessage.Data)))
 
+		// Acknowledge the message
+		// Send 'Ack' back to PubSub-system that message has taken care of, even without a successful execution
+		var ackWithResult *pubsub.AckResult
+		ackWithResult = pubSubMessage.AckWithResult()
+
+		acknowledgeStatus, err := ackWithResult.Get(context.Background())
+
+		if err != nil {
+			common_config.Logger.WithFields(logrus.Fields{
+				"ID":                "43588e3e-d9b8-48fd-a9a2-401c3d121c41",
+				"acknowledgeStatus": acknowledgeStatus,
+				"err":               err,
+			}).Error("Got some problem when send ACK to PubSub system")
+
+		} else {
+
+			common_config.Logger.WithFields(logrus.Fields{
+				"ID": "214e8997-223a-47bb-bcb6-5fce4b2310c6",
+			}).Debug("Success in Acknowledged message")
+		}
+
 		// Remove any unwanted characters
 		// Remove '\n'
 		var cleanedMessage string
@@ -165,72 +186,18 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 				"Id":                         "df899f00-5e6a-49c3-a272-ecb3e4bc19f2",
 				"Error":                      err,
 				"string(pubSubMessage.Data)": string(pubSubMessage.Data),
-			}).Error("Something went wrong when converting 'PubSub-message into proto-message")
+			}).Error("Something went wrong when converting 'PubSub-message into proto-message. Message will be lost")
 
-			// Drop this message, without sending 'Ack'
 			return
 		}
 
 		// Trigger TestInstruction in parallel while processing next message
 		go func() {
 
-			/*
-				// Channel to signal when message processing is done
-				doneProcessing := make(chan bool)
-
-				// Start a goroutine to extend the ack deadline
-				go func() {
-					ticker := time.NewTicker(25 * time.Second)
-					defer ticker.Stop()
-
-					for {
-						select {
-						case <-ticker.C:
-							// Extend the deadline by 30 seconds
-							subConfigToUpdate := pubsub.SubscriptionConfigToUpdate{
-								AckDeadline: 30 * time.Second, // changing the ack deadline
-							}
-
-							// Perform the update
-							_, err = clientSubscription.Update(ctx, subConfigToUpdate)
-							if err != nil {
-
-								common_config.Logger.WithFields(logrus.Fields{
-									"ID":                 "476cc867-8fc7-40ef-85c7-fc959d397003",
-									"pubSubMessage.Data": string(pubSubMessage.Data),
-								}).Error("Couldn't update 'AckDeadline'")
-
-								return
-							}
-
-						case <-doneProcessing:
-							return
-						}
-					}
-				}()
-
-			*/
-
-			// Acknowledge the message
-			// Send 'Ack' back to PubSub-system that message has taken care of, even without a successful execution
-			pubSubMessage.Ack()
-
 			err = triggerProcessTestInstructionExecution(pubSubMessage.Data)
 
-			// stop prolonging of 'AckDeadline'
-			//doneProcessing <- true
-
-			if err == nil {
-
-				// Acknowledge the message
-				// Send 'Ack' back to PubSub-system that message has taken care of
-				//pubSubMessage.Ack()
-
-			} else {
-
-				common_config.Logger.WithFields(logrus.Fields{
-					"ID": "2d74199d-a434-4658-a085-46a83c14c8fb",
-				}).Error("Failed to Process TestInstructionExecution")
+			if err != nil {
+				common_config.Logger.WithFields(logrus.Fields{}).Error("Failed to Process TestInstructionExecution and Message could be lost")
 
 			}
 		}()

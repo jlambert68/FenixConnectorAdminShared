@@ -120,18 +120,19 @@ func retrievePubSubMessagesViaRestApi(subscriptionID string, oauth2Token string)
 			}).Debug("Success in Acknowledged message")
 
 			// Trigger TestInstruction in parallel while processing next message
-			go func() {
+			go func(messageAsByte []byte) {
 
-				err = triggerProcessTestInstructionExecution(message.Message.Data)
+				var err2 error
+				err2 = triggerProcessTestInstructionExecution(messageAsByte)
 
-				if err != nil {
+				if err2 != nil {
 
 					common_config.Logger.WithFields(logrus.Fields{
 						"ID": "657fd8b2-2d9b-4158-8dbb-9f12668b94b2",
 					}).Error("Failed to Process TestInstructionExecution and Message could be lost")
 
 				}
-			}()
+			}(message.Message.Data)
 		}
 
 	}

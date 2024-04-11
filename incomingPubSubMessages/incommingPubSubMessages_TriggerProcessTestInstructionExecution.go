@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -43,6 +44,34 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 
 		// Drop this message, without sending 'Ack'
 		return err
+	}
+
+	// Check if this message has already been processed
+	var uniqueMessageIdentifier string
+	var isDuplicate bool
+
+	uniqueMessageIdentifier = processTestInstructionExecutionPubSubRequest.GetTestInstruction().
+		GetTestInstructionExecutionUuid() +
+		strconv.Itoa(int(processTestInstructionExecutionPubSubRequest.GetTestInstruction().
+			GetTestInstructionExecutionVersion()))
+
+	isDuplicate, err = checkForDuplicatesAndAddForMessages(uniqueMessageIdentifier)
+
+	// If there was an error when checking for duplicate then return back for next message
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"Id":                         "f315bb41-8d09-4e78-973d-0136cd93e5b7",
+			"Error":                      err,
+			"string(pubSubMessage.Data)": string(pubSubMessage),
+		}).Error("Got some problem when checking if this message is a duplicate")
+	}
+
+	// If it is a duplicate message then just return back for next message
+	if isDuplicate == true {
+		common_config.Logger.WithFields(logrus.Fields{
+			"Id":                         "f315bb41-8d09-4e78-973d-0136cd93e5b7",
+			"string(pubSubMessage.Data)": string(pubSubMessage),
+		}).Error("Message is a duplicate")
 	}
 
 	var couldSend bool

@@ -64,14 +64,18 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 			"Error":                      err,
 			"string(pubSubMessage.Data)": string(pubSubMessage),
 		}).Error("Got some problem when checking if this message is a duplicate")
+
+		return err
 	}
 
 	// If it is a duplicate message then just return back for next message
 	if isDuplicate == true {
 		common_config.Logger.WithFields(logrus.Fields{
-			"Id":                         "f315bb41-8d09-4e78-973d-0136cd93e5b7",
+			"Id":                         "31ff2119-3b12-45d8-999c-3b27b5c47894",
 			"string(pubSubMessage.Data)": string(pubSubMessage),
 		}).Error("Message is a duplicate")
+
+		return nil
 	}
 
 	var couldSend bool

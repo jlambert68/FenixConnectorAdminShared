@@ -2,9 +2,11 @@ package incomingPubSubMessages
 
 import (
 	"context"
+	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	"github.com/sirupsen/logrus"
+	"math"
 	"time"
 )
 
@@ -67,9 +69,15 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 	var returnMessage string
 	var ctx context.Context
 
+	falseCount := 0
+	currentInterval := time.Second
+
+	ticker := time.NewTicker(currentInterval)
+	defer ticker.Stop()
+
 	ctx = context.Background()
 
-	for {
+	for range ticker.C {
 
 		// Generate a new token is needed
 		_, returnAckNack, returnMessage = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GenerateTokenForPubSub)
@@ -85,25 +93,66 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 
 		} else {
 
-			// Pull a certain number of messages from Subscription
-			numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub())
+			fmt.Printf("Tick at: %v, numberOfMessagesInPullResponse: %d, Interval: %v\n", time.Now(), numberOfMessagesInPullResponse, currentInterval)
+			if numberOfMessagesInPullResponse > 0 {
+				// Reset the false count and interval when condition is true
+				falseCount = 0
+				if currentInterval != time.Second {
+					currentInterval = time.Second
+					ticker.Reset(currentInterval)
+				}
 
-			if err != nil {
+				// Pull a certain number of messages from Subscription
+				numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub())
 
-				common_config.Logger.WithFields(logrus.Fields{
-					"ID":  "32cdeb33-26a0-480d-98f9-ce06d13bb8aa",
-					"err": err,
-				}).Fatalln("PubSub receiver for TestInstructionExecutions ended, which is not intended")
+				if err != nil {
 
-			}
+					common_config.Logger.WithFields(logrus.Fields{
+						"ID":  "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
+						"err": err,
+					}).Fatalln("Got som problem when doing PubSub-receive")
+				}
 
-			// If there are more than zero messages then don't wait
-			if numberOfMessagesInPullResponse == 0 {
-				// Wait 15 seconds before looking for more PubSub-messages
-				time.Sleep(5 * time.Second)
+			} else {
+				falseCount++
+				if falseCount >= 10 {
+					// Ramp up the interval slowly up to 60 seconds
+					if currentInterval < 60*time.Second {
+						newInterval := nextInterval(currentInterval)
+						if newInterval != currentInterval {
+							currentInterval = newInterval
+							ticker.Reset(currentInterval)
+							fmt.Printf("Interval adjusted to: %v\n", currentInterval)
+						}
+					}
+				}
 			}
 		}
+	}
+}
 
+// Calculate the next wait interval before checking PubSub
+func nextInterval(current time.Duration) time.Duration {
+	const maxDuration = 60 * time.Second
+	const minDuration = 1 * time.Second
+	const midPoint = 30 * time.Second
+
+	// Calculate how far the current duration is from the midpoint in percentage
+	midpointOffset := float64(current-minDuration) / float64(midPoint-minDuration)
+
+	// Calculate a scaling factor using a simple parabolic equation, scaled to slow down initial and final increments
+	scaleFactor := 4 * (midpointOffset - math.Pow(midpointOffset, 2)) // This creates a parabolic curve
+
+	// Determine the increment, scaled by the calculated factor
+	increment := time.Duration(float64(maxDuration-minDuration) * scaleFactor / 10)
+	if increment < time.Second {
+		increment = time.Second
 	}
 
+	newInterval := current + increment
+	if newInterval > maxDuration {
+		newInterval = maxDuration
+	}
+
+	return newInterval
 }

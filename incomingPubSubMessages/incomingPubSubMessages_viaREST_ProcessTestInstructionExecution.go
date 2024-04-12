@@ -69,6 +69,7 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 	var returnMessage string
 	var ctx context.Context
 
+	resetTickerCondition := true
 	falseCount := 0
 	currentInterval := time.Second
 
@@ -94,26 +95,18 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 		} else {
 
 			fmt.Printf("Tick at: %v, numberOfMessagesInPullResponse: %d, Interval: %v\n", time.Now(), numberOfMessagesInPullResponse, currentInterval)
-			if numberOfMessagesInPullResponse > 0 {
-				// Reset the false count and interval when condition is true
+			if resetTickerCondition == true {
+
+				// Reset the false count and interval when resetTickerCondition is true
 				falseCount = 0
 				if currentInterval != time.Second {
 					currentInterval = time.Second
 					ticker.Reset(currentInterval)
 				}
 
-				// Pull a certain number of messages from Subscription
-				numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub())
-
-				if err != nil {
-
-					common_config.Logger.WithFields(logrus.Fields{
-						"ID":  "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
-						"err": err,
-					}).Fatalln("Got som problem when doing PubSub-receive")
-				}
-
 			} else {
+
+				// Increase falseCount and, when reached max tries, then ramp up Ticker delay
 				falseCount++
 				if falseCount >= 10 {
 					// Ramp up the interval slowly up to 60 seconds
@@ -126,6 +119,24 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 						}
 					}
 				}
+			}
+
+			// Pull a certain number of messages from Subscription
+			numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub())
+
+			if err != nil {
+
+				common_config.Logger.WithFields(logrus.Fields{
+					"ID":  "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
+					"err": err,
+				}).Fatalln("Got som problem when doing PubSub-receive")
+			}
+
+			// Reset Ticker condition if there were any messages
+			if numberOfMessagesInPullResponse > 0 {
+				resetTickerCondition = true
+			} else {
+				resetTickerCondition = false
 			}
 		}
 	}

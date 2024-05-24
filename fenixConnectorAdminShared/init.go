@@ -222,4 +222,14 @@ func fenixConnectorAdminSharedInit() {
 	common_config.ProxyServerURL = environmentVariables.
 		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ProxyServerURL")
 
+	// Extract if SPIRE Server should be used when requesting
+	common_config.ShouldSpireServerBeUsedForGettingGcpToken, err = strconv.ParseBool(
+		environmentVariables.
+			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ShouldSpireServerBeUsedForGettingGcpToken"))
+	if err != nil {
+		fmt.Println("Couldn't convert environment variable "+
+			"'ShouldSpireServerBeUsedForGettingGcpToken:' to an boolean, error: ", err)
+		os.Exit(0)
+	}
+
 }

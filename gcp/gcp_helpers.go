@@ -18,6 +18,7 @@ import (
 	"google.golang.org/api/idtoken"
 	grpcMetadata "google.golang.org/grpc/metadata"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"runtime"
@@ -41,6 +42,14 @@ var tempKeyAsHash string
 
 func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (
 	appendedCtx context.Context, returnAckNack bool, returnMessage string) {
+
+	// Check if GCP auth-token should be received from SPIRE-server in OpenShift
+	if common_config.ShouldSpireServerBeUsedForGettingGcpToken == true {
+
+		appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenFromOpenShift(ctx)
+
+		return appendedCtx, returnAckNack, returnMessage
+	}
 
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
@@ -84,6 +93,60 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 
 	}
 	return appendedCtx, returnAckNack, returnMessage
+
+}
+
+// Generate Google access token. Used when running in OpenShift
+func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
+
+	// sgcp endpoint for fetching the token
+	sgcpEndpoint := "http://localhost:8080" // http://localhost:8234/token
+
+	// Create a new HTTP request to fetch the token
+	req, err := http.NewRequest("GET", sgcpEndpoint, nil)
+	if err != nil {
+
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "1f084565-c40c-4336-ade6-e9dc5be615fc",
+			"err": err,
+		}).Fatalln("Failed to create request: %v\n", err)
+	}
+
+	// Perform the HTTP request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "5e9346fc-0b32-4e67-afb0-e68878e092ce",
+			"err": err,
+		}).Fatalln("Failed to perform request: %v\n", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Failed to read response body: %v\n", err)
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "1967ceda-29e1-4418-923f-0fe21a84bfcd",
+			"err": err,
+		}).Fatalln("Failed to read response body: %v\n", err)
+	}
+
+	// Print the token
+	token := string(body)
+	fmt.Printf("GCP Token: %s\n", token)
+
+	common_config.Logger.WithFields(logrus.Fields{
+		"ID": "b0d89f60-3df9-4fb3-9151-34d64638f262",
+		//"FenixExecutionWorkerObject.gcpAccessToken": gcp.gcpAccessTokenForServiceAccounts,
+	}).Debug("Will use Bearer Token")
+
+	// Add token to GrpcServer Request.
+	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken)
+
+	return appendedCtx, true, ""
 
 }
 

@@ -52,4 +52,8 @@ var (
 	// ShouldSpireServerBeUsedForGettingGcpToken
 	// When running on OpenShift then a SPIRE-server is used to get an auth token from GCP
 	ShouldSpireServerBeUsedForGettingGcpToken bool
+
+	// OpenShiftsGcpTokenSourceUrl
+	// URL to OpenShift's GCP-token source
+	OpenShiftsGcpTokenSourceUrl string
 )

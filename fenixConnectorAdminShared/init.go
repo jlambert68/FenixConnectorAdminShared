@@ -232,4 +232,8 @@ func fenixConnectorAdminSharedInit() {
 		os.Exit(0)
 	}
 
+	// Extract URL to OpenShift's GCP-token source
+	common_config.OpenShiftsGcpTokenSourceUrl = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("OpenShiftsGcpTokenSourceUrl")
+
 }

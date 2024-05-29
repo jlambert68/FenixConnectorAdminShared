@@ -100,14 +100,14 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
 	// sgcp endpoint for fetching the token
-	sgcpEndpoint := "http://localhost:8080" // http://localhost:8234/token
+	sgcpEndpoint := common_config.OpenShiftsGcpTokenSourceUrl
 
 	// Create a new HTTP request to fetch the token
 	req, err := http.NewRequest("GET", sgcpEndpoint, nil)
 	if err != nil {
 
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "1f084565-c40c-4336-ade6-e9dc5be615fc",
+			"ID":  "d0c71fbe-5d02-4d58-b5d8-e5e9d104d45b",
 			"err": err,
 		}).Fatalln("Failed to create request: %v\n", err)
 	}
@@ -118,7 +118,7 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Cont
 	if err != nil {
 
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "5e9346fc-0b32-4e67-afb0-e68878e092ce",
+			"ID":  "30a6291e-ecf2-4011-87d8-0697389d3a60",
 			"err": err,
 		}).Fatalln("Failed to perform request: %v\n", err)
 	}
@@ -129,7 +129,7 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Cont
 	if err != nil {
 		fmt.Printf("Failed to read response body: %v\n", err)
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "1967ceda-29e1-4418-923f-0fe21a84bfcd",
+			"ID":  "8f6cdef3-619f-4594-9b37-eabf7f5fb903",
 			"err": err,
 		}).Fatalln("Failed to read response body: %v\n", err)
 	}
@@ -139,12 +139,12 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Cont
 	fmt.Printf("GCP Token: %s\n", token)
 
 	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "b0d89f60-3df9-4fb3-9151-34d64638f262",
+		"ID": "6ac9a073-195f-42b0-8d9f-3d0a8ebf7ed0",
 		//"FenixExecutionWorkerObject.gcpAccessToken": gcp.gcpAccessTokenForServiceAccounts,
 	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.
-	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken)
+	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token)
 
 	return appendedCtx, true, ""
 

@@ -37,6 +37,14 @@ const (
 	GetTokenForGrpcAndPubSub
 )
 
+/*type ServiceAccountInfo struct {
+	Aliases []string `json:"aliases"`
+	Email   string   `json:"email"`
+	Scopes  []string `json:"scopes"`
+}
+
+*/
+
 // Key for NewCookieStore
 var tempKeyAsHash string
 
@@ -44,15 +52,14 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 	appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
 	// Check if GCP auth-token should be received from SPIRE-server in OpenShift
-	/*
-		if common_config.ShouldSpireServerBeUsedForGettingGcpToken == true {
+	if common_config.ShouldSpireServerBeUsedForGettingGcpToken == true {
 
-			appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenFromOpenShift(ctx)
+		return ctx, true, ""
 
-			return appendedCtx, returnAckNack, returnMessage
-		}
+		//appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenFromOpenShift(ctx)
 
-	*/
+		//return appendedCtx, returnAckNack, returnMessage
+	}
 
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {

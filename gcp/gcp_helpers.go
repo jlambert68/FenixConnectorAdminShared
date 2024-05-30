@@ -44,12 +44,15 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 	appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
 	// Check if GCP auth-token should be received from SPIRE-server in OpenShift
-	if common_config.ShouldSpireServerBeUsedForGettingGcpToken == true {
+	/*
+		if common_config.ShouldSpireServerBeUsedForGettingGcpToken == true {
 
-		appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenFromOpenShift(ctx)
+			appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenFromOpenShift(ctx)
 
-		return appendedCtx, returnAckNack, returnMessage
-	}
+			return appendedCtx, returnAckNack, returnMessage
+		}
+
+	*/
 
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
@@ -161,7 +164,11 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 		// Create an identity token.
 		// With a global TokenSource tokens would be reused and auto-refreshed at need.
 		// A given TokenSource is specific to the audience.
-		tokenSource, err := idtoken.NewTokenSource(ctx, "https://"+common_config.FenixExecutionWorkerAddress)
+		var tokenSource oauth2.TokenSource
+		var err error
+
+		tokenSource, err = idtoken.NewTokenSource(ctx, "https://"+common_config.FenixExecutionWorkerAddress)
+
 		if err != nil {
 			common_config.Logger.WithFields(logrus.Fields{
 				"ID":  "11b41921-92fa-48ed-914f-0dde41282609",
@@ -235,8 +242,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 			return nil, false, "Problem getting the token"
 		} else {
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID": "a17e40dc-e7fc-4d7e-afbc-072a4c21850b",
-				//"token": token,
+				"ID":    "a17e40dc-e7fc-4d7e-afbc-072a4c21850b",
+				"token": token,
 			}).Debug("Got Bearer Token")
 		}
 

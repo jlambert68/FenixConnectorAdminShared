@@ -188,8 +188,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 			return nil, false, "Problem getting the token"
 		} else {
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID": "fee61402-aefa-4d4a-87ff-04b02c055366",
-				//"token": token,
+				"ID":    "fee61402-aefa-4d4a-87ff-04b02c055366",
+				"token": token,
 			}).Debug("Got Bearer Token")
 		}
 
@@ -198,8 +198,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 	}
 
 	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "9bfd3d3a-7155-4f72-9cbc-e051f4544135",
-		//"FenixExecutionWorkerObject.gcpAccessToken": gcp.gcpAccessTokenForServiceAccounts,
+		"ID":                                  "52ccc212-601d-409b-a177-28782fa09d6f",
+		"cp.gcpAccessTokenForServiceAccounts": gcp.gcpAccessTokenForServiceAccounts,
 	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.
@@ -252,8 +252,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 	}
 
 	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "42427b1e-af8d-4153-9963-85c36a0f58cf",
-		//"FenixExecutionWorkerObject.gcpAccessToken": gcp.gcpAccessTokenForServiceAccounts,
+		"ID": "7913b32c-70c5-4ae5-841f-04943107131c",
+		" gcp.gcpAccessTokenForServiceAccountsPubSub": gcp.gcpAccessTokenForServiceAccountsPubSub,
 	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.

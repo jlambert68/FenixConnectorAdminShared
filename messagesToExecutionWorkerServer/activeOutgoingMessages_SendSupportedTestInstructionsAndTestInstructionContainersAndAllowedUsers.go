@@ -10,6 +10,7 @@ import (
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/TypeAndStructs"
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 	"time"
 )
 
@@ -148,12 +149,15 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	for {
 
 		fmt.Println("ctx:", ctx)
+		md, _ := metadata.FromOutgoingContext(ctx)
+		for key, value := range md {
+			fmt.Println(key, value)
+		}
 
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":            "f3002be9-0c8d-4f19-9a0e-a62070143a51",
-			"ctx":           ctx,
-			"authorization": ctx.Value("authorization"),
-			"Authorization": ctx.Value("Authorization"),
+			"ID":  "f3002be9-0c8d-4f19-9a0e-a62070143a51",
+			"ctx": ctx,
+			"md":  md,
 		}).Info("'ctx' in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
 
 		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.

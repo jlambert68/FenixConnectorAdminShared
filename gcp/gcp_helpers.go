@@ -259,6 +259,13 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 	}
 
 	common_config.Logger.WithFields(logrus.Fields{
+		"ID": "be4b0370-e578-4664-8fd7-4bb5099e6261",
+		"gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken": gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken,
+		"gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry":      gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry,
+		"time.Now()": time.Now(),
+	}).Info("Will use Bearer Token")
+
+	common_config.Logger.WithFields(logrus.Fields{
 		"ID": "7913b32c-70c5-4ae5-841f-04943107131c",
 		" gcp.gcpAccessTokenForServiceAccountsPubSub": gcp.gcpAccessTokenForServiceAccountsPubSub,
 	}).Debug("Will use Bearer Token")

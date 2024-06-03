@@ -2,6 +2,7 @@ package messagesToExecutionWorkerServer
 
 import (
 	"context"
+	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
@@ -145,6 +146,12 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
 
 	for {
+
+		fmt.Println("ctx:", ctx)
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "f3002be9-0c8d-4f19-9a0e-a62070143a51",
+			"ctx": ctx,
+		}).Fatalln("'ctx' in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
 
 		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.
 			ConnectorPublishSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers(

@@ -148,10 +148,13 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	for {
 
 		fmt.Println("ctx:", ctx)
+
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "f3002be9-0c8d-4f19-9a0e-a62070143a51",
-			"ctx": ctx,
-		}).Fatalln("'ctx' in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
+			"ID":            "f3002be9-0c8d-4f19-9a0e-a62070143a51",
+			"ctx":           ctx,
+			"authorization": ctx.Value("authorization"),
+			"Authorization": ctx.Value("Authorization"),
+		}).Info("'ctx' in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
 
 		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.
 			ConnectorPublishSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers(

@@ -70,12 +70,12 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 	//myctx := metadata.NewOutgoingContext(ctx, md2)
 
 	// Creates a new temporary client only to be used for this call
-	var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
-	tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
-		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
+	//var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
+	//tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
+	//	NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
 
 	var connectorIsReadyResponseMessage *fenixExecutionWorkerGrpcApi.ConnectorIsReadyResponseMessage
-	connectorIsReadyResponseMessage, err = tempFenixExecutionWorkerConnectorGrpcServicesClient.
+	connectorIsReadyResponseMessage, err = fenixExecutionWorkerGrpcClient.
 		ConnectorInformsItIsAlive(ctx, connectorIsReadyMessage)
 
 	// Shouldn't happen

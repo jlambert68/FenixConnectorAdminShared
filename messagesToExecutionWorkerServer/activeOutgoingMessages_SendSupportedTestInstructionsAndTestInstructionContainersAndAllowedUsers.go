@@ -142,9 +142,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	gRPCCallAttemptCounter = 0
 
 	// Creates a new temporary client only to be used for this call
-	var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
-	tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
-		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
+	//var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
+	//tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
+	//	NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
 
 	for {
 
@@ -160,7 +160,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 			"md":  md,
 		}).Info("'ctx' in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
 
-		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.
+		returnMessage, err := fenixExecutionWorkerGrpcClient.
 			ConnectorPublishSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers(
 				ctx,
 				supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage)

@@ -70,13 +70,13 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendConnec
 	gRPCCallAttemptCounter = 0
 
 	// Creates a new temporary client only to be used for this call
-	var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
-	tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
-		NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
+	//var tempFenixExecutionWorkerConnectorGrpcServicesClient fenixExecutionWorkerGrpcApi.FenixExecutionWorkerConnectorGrpcServicesClient
+	//tempFenixExecutionWorkerConnectorGrpcServicesClient = fenixExecutionWorkerGrpcApi.
+	//	NewFenixExecutionWorkerConnectorGrpcServicesClient(remoteFenixExecutionWorkerServerConnection)
 
 	for {
 
-		returnMessage, err := tempFenixExecutionWorkerConnectorGrpcServicesClient.
+		returnMessage, err := fenixExecutionWorkerGrpcClient.
 			ConnectorProcessTestInstructionExecutionResponse(ctx, processTestInstructionExecutionResponse)
 
 		// Add to counter for how many gRPC-call-attempts to Worker that have been done

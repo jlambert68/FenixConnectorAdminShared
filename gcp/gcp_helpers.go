@@ -615,8 +615,18 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx co
 }
 
 func (gcp *GcpObjectStruct) GetGcpAccessTokenForAuthorizedAccountsPubSub() string {
-	return gcp.refreshTokenResponse.AccessToken
-	//return gcp.gcpAccessTokenForAuthorizedAccountsPubSub.AccessToken
+
+	// Only use Authorized used when running locally and WorkerServer is on GCP
+	if common_config.ExecutionLocationForConnector == common_config.LocalhostNoDocker {
+
+		// Use Authorized user when targeting GCP from local
+		return gcp.refreshTokenResponse.AccessToken
+
+	} else {
+		// Use token for Service Account
+		return gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken
+	}
+
 }
 
 func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForOAuthUserPubSub(

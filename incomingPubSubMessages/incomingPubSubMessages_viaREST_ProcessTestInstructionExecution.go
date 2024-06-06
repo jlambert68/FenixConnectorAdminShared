@@ -68,6 +68,7 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 	var returnAckNack bool
 	var returnMessage string
 	var ctx context.Context
+	var accessToken string
 
 	resetTickerCondition := true
 	falseCount := 0
@@ -121,19 +122,31 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 				}
 			}
 
-			// Pull a certain number of messages from Subscription
-			numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub())
-
+			// Get AccessToken
+			accessToken, err = gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub()
 			if err != nil {
-
 				common_config.Logger.WithFields(logrus.Fields{
-					"ID":  "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
+					"ID":  "3480675a-e306-4bec-9e3a-709f20311a5c",
 					"err": err,
-				}).Fatalln("Got som problem when doing PubSub-receive")
+				}).Error("Got som problem when retrieving access token")
+
+			} else {
+
+				// Pull a certain number of messages from Subscription
+				numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, accessToken)
+
+				if err != nil {
+
+					common_config.Logger.WithFields(logrus.Fields{
+						"ID":          "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
+						"accessToken": accessToken,
+						"err":         err,
+					}).Error("Got som problem when doing PubSub-receive")
+				}
 			}
 
 			// Reset Ticker condition if there were any messages
-			if numberOfMessagesInPullResponse > 0 {
+			if numberOfMessagesInPullResponse > 0 && err == nil {
 				resetTickerCondition = true
 			} else {
 				resetTickerCondition = false

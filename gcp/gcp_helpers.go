@@ -3,6 +3,7 @@ package gcp
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	uuidGenerator "github.com/google/uuid"
 	"github.com/gorilla/pat"
@@ -50,16 +51,6 @@ var tempKeyAsHash string
 
 func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (
 	appendedCtx context.Context, returnAckNack bool, returnMessage string) {
-
-	// Check if GCP auth-token should be received from SPIRE-server in OpenShift
-	if common_config.ShouldSpireServerBeUsedForGettingGcpToken == true {
-
-		return ctx, true, ""
-
-		//appendedCtx, returnAckNack, returnMessage = gcp.generateGCPAccessTokenFromOpenShift(ctx)
-
-		//return appendedCtx, returnAckNack, returnMessage
-	}
 
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
@@ -264,11 +255,6 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 		"gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry":      gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry,
 		"time.Now()": time.Now(),
 	}).Info("Will use Bearer Token")
-
-	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "7913b32c-70c5-4ae5-841f-04943107131c",
-		" gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken": gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken,
-	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.
 	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken)
@@ -614,13 +600,13 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx co
 
 }
 
-func (gcp *GcpObjectStruct) GetGcpAccessTokenForAuthorizedAccountsPubSub() string {
+func (gcp *GcpObjectStruct) GetGcpAccessTokenForAuthorizedAccountsPubSub() (string, error) {
 
 	// Only use Authorized used when running locally and WorkerServer is on GCP
 	if common_config.ExecutionLocationForConnector == common_config.LocalhostNoDocker {
 
 		// Use Authorized user when targeting GCP from local
-		return gcp.refreshTokenResponse.AccessToken
+		return gcp.refreshTokenResponse.AccessToken, nil
 
 	} else {
 
@@ -628,12 +614,15 @@ func (gcp *GcpObjectStruct) GetGcpAccessTokenForAuthorizedAccountsPubSub() strin
 		if returnAckNack == false {
 
 			common_config.Logger.WithFields(logrus.Fields{
-				"id":            "e929a3ac-44a3-439a-a820-493e13318489",
+				"id":            "8301ed91-2875-45a1-88bb-7d55f8f32fb1",
 				"returnMessage": returnMessage,
-			}).Error("Problem when generating a new token. Waiting some time before next try")
+			}).Error("Problem when generating a new token")
+
+			return "", errors.New(returnMessage)
 		}
+
 		// Use token for Service Account
-		return gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken
+		return gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken, nil
 	}
 
 }

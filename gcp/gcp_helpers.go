@@ -624,7 +624,7 @@ func (gcp *GcpObjectStruct) GetGcpAccessTokenForAuthorizedAccountsPubSub() strin
 
 	} else {
 
-		_, returnAckNack, returnMessage := gcp.GenerateGCPAccessToken(context.Background(), gcp.GenerateTokenForPubSub)
+		_, returnAckNack, returnMessage := gcp.GenerateGCPAccessToken(context.Background(), GenerateTokenForPubSub)
 		if returnAckNack == false {
 
 			common_config.Logger.WithFields(logrus.Fields{

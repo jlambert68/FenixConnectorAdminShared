@@ -90,7 +90,7 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 			common_config.Logger.WithFields(logrus.Fields{
 				"id":            "4d4f1144-a905-4b3c-8d71-ef533eea514c",
 				"returnMessage": returnMessage,
-			}).Debug("Problem when generating a new token. Waiting some time before next try")
+			}).Error("Problem when generating a new token. Waiting some time before next try")
 
 		} else {
 

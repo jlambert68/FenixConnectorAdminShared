@@ -146,7 +146,7 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Cont
 
 	// Print the token
 	token := string(body)
-	fmt.Printf("GCP Token: %s\n", token)
+	//fmt.Printf("GCP Token: %s\n", token)
 
 	common_config.Logger.WithFields(logrus.Fields{
 		"ID": "6ac9a073-195f-42b0-8d9f-3d0a8ebf7ed0",
@@ -195,8 +195,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 			return nil, false, "Problem getting the token"
 		} else {
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID":    "fee61402-aefa-4d4a-87ff-04b02c055366",
-				"token": token,
+				"ID": "fee61402-aefa-4d4a-87ff-04b02c055366",
+				//"token": token,
 			}).Debug("Got Bearer Token")
 		}
 
@@ -205,8 +205,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 	}
 
 	common_config.Logger.WithFields(logrus.Fields{
-		"ID":                                  "52ccc212-601d-409b-a177-28782fa09d6f",
-		"cp.gcpAccessTokenForServiceAccounts": gcp.gcpAccessTokenForServiceAccounts,
+		"ID": "52ccc212-601d-409b-a177-28782fa09d6f",
+		//"gcp.gcpAccessTokenForServiceAccounts": gcp.gcpAccessTokenForServiceAccounts,
 	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.
@@ -267,7 +267,7 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 
 	common_config.Logger.WithFields(logrus.Fields{
 		"ID": "7913b32c-70c5-4ae5-841f-04943107131c",
-		" gcp.gcpAccessTokenForServiceAccountsPubSub": gcp.gcpAccessTokenForServiceAccountsPubSub,
+		" gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken": gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken,
 	}).Debug("Will use Bearer Token")
 
 	// Add token to GrpcServer Request.
@@ -623,6 +623,15 @@ func (gcp *GcpObjectStruct) GetGcpAccessTokenForAuthorizedAccountsPubSub() strin
 		return gcp.refreshTokenResponse.AccessToken
 
 	} else {
+
+		_, returnAckNack, returnMessage := gcp.GenerateGCPAccessToken(context.Background(), gcp.GenerateTokenForPubSub)
+		if returnAckNack == false {
+
+			common_config.Logger.WithFields(logrus.Fields{
+				"id":            "e929a3ac-44a3-439a-a820-493e13318489",
+				"returnMessage": returnMessage,
+			}).Error("Problem when generating a new token. Waiting some time before next try")
+		}
 		// Use token for Service Account
 		return gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken
 	}

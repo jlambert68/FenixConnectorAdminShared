@@ -148,6 +148,10 @@ func PullPubSubTestInstructionExecutionMessages(accessTokenReceivedChannelPtr *c
 	// Get Topics
 	var pubSubTopicIterator *pubsub.TopicIterator
 	pubSubTopicIterator = pubSubClient.Topics(ctx)
+
+	// Access token
+	var accessToken string
+
 	for {
 		var pubSubTopic *pubsub.Topic
 		pubSubTopic, err = pubSubTopicIterator.Next()
@@ -213,15 +217,29 @@ func PullPubSubTestInstructionExecutionMessages(accessTokenReceivedChannelPtr *c
 
 	for {
 
-		numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub())
+		// Get AccessToken
+		accessToken, err = gcp.Gcp.GetGcpAccessTokenForAuthorizedAccountsPubSub()
 
 		if err != nil {
-
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID":  "856533ec-5ba9-46ff-b8c5-af7f3a9da2ac",
+				"ID":  "3480675a-e306-4bec-9e3a-709f20311a5c",
 				"err": err,
-			}).Fatalln("PubSub receiver for TestInstructionExecutions ended, which is not intended")
+			}).Error("Got som problem when retrieving access token")
 
+			numberOfMessagesInPullResponse = 0
+
+		} else {
+
+			numberOfMessagesInPullResponse, err = retrievePubSubMessagesViaRestApi(subID, accessToken)
+
+			if err != nil {
+
+				common_config.Logger.WithFields(logrus.Fields{
+					"ID":  "856533ec-5ba9-46ff-b8c5-af7f3a9da2ac",
+					"err": err,
+				}).Fatalln("PubSub receiver for TestInstructionExecutions ended, which is not intended")
+
+			}
 		}
 
 		// If there are more than zero messages then don't wait

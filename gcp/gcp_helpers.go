@@ -19,7 +19,6 @@ import (
 	"google.golang.org/api/idtoken"
 	grpcMetadata "google.golang.org/grpc/metadata"
 	"html/template"
-	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"runtime"
@@ -94,60 +93,6 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 
 	}
 	return appendedCtx, returnAckNack, returnMessage
-
-}
-
-// Generate Google access token. Used when running in OpenShift
-func (gcp *GcpObjectStruct) generateGCPAccessTokenFromOpenShift(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
-
-	// sgcp endpoint for fetching the token
-	sgcpEndpoint := common_config.OpenShiftsGcpTokenSourceUrl
-
-	// Create a new HTTP request to fetch the token
-	req, err := http.NewRequest("GET", sgcpEndpoint, nil)
-	if err != nil {
-
-		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "d0c71fbe-5d02-4d58-b5d8-e5e9d104d45b",
-			"err": err,
-		}).Fatalln("Failed to create request: %v\n", err)
-	}
-
-	// Perform the HTTP request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-
-		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "30a6291e-ecf2-4011-87d8-0697389d3a60",
-			"err": err,
-		}).Fatalln("Failed to perform request: %v\n", err)
-	}
-	defer resp.Body.Close()
-
-	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Failed to read response body: %v\n", err)
-		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "8f6cdef3-619f-4594-9b37-eabf7f5fb903",
-			"err": err,
-		}).Fatalln("Failed to read response body: %v\n", err)
-	}
-
-	// Print the token
-	token := string(body)
-	//fmt.Printf("GCP Token: %s\n", token)
-
-	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "6ac9a073-195f-42b0-8d9f-3d0a8ebf7ed0",
-		//"FenixExecutionWorkerObject.gcpAccessToken": gcp.gcpAccessTokenForServiceAccounts,
-	}).Debug("Will use Bearer Token")
-
-	// Add token to GrpcServer Request.
-	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token)
-
-	return appendedCtx, true, ""
 
 }
 
@@ -240,8 +185,8 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 			return nil, false, "Problem getting the token"
 		} else {
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID":    "a17e40dc-e7fc-4d7e-afbc-072a4c21850b",
-				"token": token,
+				"ID": "a17e40dc-e7fc-4d7e-afbc-072a4c21850b",
+				//"token": token,
 			}).Debug("Got Bearer Token")
 		}
 
@@ -251,8 +196,7 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 
 	common_config.Logger.WithFields(logrus.Fields{
 		"ID": "be4b0370-e578-4664-8fd7-4bb5099e6261",
-		"gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken": gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken,
-		"gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry":      gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry,
+		"gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry": gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry,
 		"time.Now()": time.Now(),
 	}).Info("Will use Bearer Token")
 

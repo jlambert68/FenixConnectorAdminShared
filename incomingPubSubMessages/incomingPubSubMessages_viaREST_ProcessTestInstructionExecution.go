@@ -138,9 +138,9 @@ func PullPubSubTestInstructionExecutionMessagesGcpRestApi(connectorIsReadyToRece
 				if err != nil {
 
 					common_config.Logger.WithFields(logrus.Fields{
-						"ID":          "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
-						"accessToken": accessToken,
-						"err":         err,
+						"ID": "7efbd7d7-7761-4c94-8306-ac7349cb93c9",
+						//"accessToken": accessToken,
+						"err": err,
 					}).Error("Got som problem when doing PubSub-receive")
 				}
 			}

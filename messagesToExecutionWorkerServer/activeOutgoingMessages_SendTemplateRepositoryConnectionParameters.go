@@ -24,8 +24,39 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 	var err error
 
 	// Do call-back to get all 	// Create supported TestInstructions, TestInstructionContainers and Allowed Users
-	var templateRepositoryConnectionParameters *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
+	var templateRepositoryConnectionParameters *common_config.RepositoryTemplatePathStruct
 	templateRepositoryConnectionParameters = common_config.ConnectorFunctionsToDoCallBackOn.GenerateTemplateRepositoryConnectionParameters()
+
+	// Convert into gRPC-message by looping incomming message
+	var templateRepositoryConnectionParametersAsGrpc *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
+	for messageIndex, repositoryConnectionParameters := range templateRepositoryConnectionParameters.TemplatePaths {
+
+		// Create one url to a Template repository
+		var tempAllTemplateRepositories *fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters
+		tempAllTemplateRepositories = &fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters{
+			RepositoryApiUrl: repositoryConnectionParameters.RepositoryApiUrl,
+			RepositoryOwner:  repositoryConnectionParameters.RepositoryOwner,
+			RepositoryName:   repositoryConnectionParameters.RepositoryName,
+			RepositoryPath:   repositoryConnectionParameters.RepositoryPath,
+			GitHubApiKey:     common_config.GitHubApiKeys[messageIndex],
+		}
+
+		// Add it to the gRPC-message
+		templateRepositoryConnectionParametersAsGrpc.AllTemplateRepositories = append(
+			templateRepositoryConnectionParametersAsGrpc.GetAllTemplateRepositories(),
+			tempAllTemplateRepositories)
+	}
+
+	// Add Domain-information
+	var tempClientSystemIdentificationMessage *fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage
+	tempClientSystemIdentificationMessage = &fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage{
+		DomainUuid:          common_config.ThisDomainsUuid,
+		ExecutionDomainUuid: common_config.ThisExecutionDomainUuid,
+		ProtoFileVersionUsedByClient: fenixExecutionWorkerGrpcApi.CurrentFenixExecutionWorkerProtoFileVersionEnum(
+			common_config.GetHighestExecutionWorkerProtoFileVersion()),
+	}
+
+	templateRepositoryConnectionParametersAsGrpc.ClientSystemIdentification = tempClientSystemIdentificationMessage
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers,
 	// Allowed User and TemplateRepositoryConnectionParameters to Worker. If not then just exit
@@ -98,7 +129,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 		returnMessage, err := fenixExecutionWorkerGrpcClient.
 			ConnectorPublishTemplateRepositoryConnectionParameters(
 				ctx,
-				templateRepositoryConnectionParameters)
+				templateRepositoryConnectionParametersAsGrpc)
 
 		// Add to counter for how many gRPC-call-attempts to Worker that have been done
 		gRPCCallAttemptCounter = gRPCCallAttemptCounter + 1

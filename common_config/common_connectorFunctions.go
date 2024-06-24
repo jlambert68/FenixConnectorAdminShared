@@ -34,7 +34,7 @@ type ConnectorCallBackFunctionsStruct struct {
 
 	// Sends this Github url parameters to where Templates are stored
 	GenerateTemplateRepositoryConnectionParameters func() (
-		templateRepositoryConnectionParameters *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters)
+		templateRepositoryConnectionParameters *RepositoryTemplatePathStruct)
 }
 
 // ConnectorFunctionsToDoCallBackOn

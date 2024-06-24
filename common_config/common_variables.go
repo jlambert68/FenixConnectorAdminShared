@@ -20,3 +20,13 @@ var ApplicationRunTimeUuid string
 type StopAliveToWorkerTickerChannelStruct struct {
 	ReturnChannel *chan bool
 }
+
+// Struct used when unmarshalling Github ApiUrl-parameters
+type RepositoryTemplatePathStruct struct {
+	TemplatePaths []struct {
+		RepositoryApiUrl string `json:"RepositoryApiUrl"`
+		RepositoryOwner  string `json:"RepositoryOwner"`
+		RepositoryName   string `json:"RepositoryName"`
+		RepositoryPath   string `json:"RepositoryPath"`
+	} `json:"TemplatePaths"`
+}

@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func fenixConnectorAdminSharedInit() {
@@ -222,18 +223,14 @@ func fenixConnectorAdminSharedInit() {
 	common_config.ProxyServerURL = environmentVariables.
 		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ProxyServerURL")
 
-	// Extract if SPIRE Server should be used when requesting
-	common_config.ShouldSpireServerBeUsedForGettingGcpToken, err = strconv.ParseBool(
-		environmentVariables.
-			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("ShouldSpireServerBeUsedForGettingGcpToken"))
-	if err != nil {
-		fmt.Println("Couldn't convert environment variable "+
-			"'ShouldSpireServerBeUsedForGettingGcpToken:' to an boolean, error: ", err)
-		os.Exit(0)
-	}
+	// Extract the key used to access GitHub for reading files
+	common_config.GitHubApiKeysAsString = environmentVariables.
+		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("GitHubApiKeys")
 
-	// Extract URL to OpenShift's GCP-token source
-	common_config.OpenShiftsGcpTokenSourceUrl = environmentVariables.
-		ExtractEnvironmentVariableOrInjectedEnvironmentVariable("OpenShiftsGcpTokenSourceUrl")
+	// Trim the character from the beginning and end of the string
+	common_config.GitHubApiKeysAsString = strings.Trim(common_config.GitHubApiKeysAsString, ";")
+
+	// Use the strings.Split function to split the string into a slice
+	common_config.GitHubApiKeys = strings.Split(common_config.GitHubApiKeysAsString, ";")
 
 }

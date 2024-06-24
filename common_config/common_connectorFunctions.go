@@ -31,6 +31,10 @@ type ConnectorCallBackFunctionsStruct struct {
 		supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.
 			TestInstructionsAndTestInstructionsContainersStruct,
 	)
+
+	// Sends this Github url parameters to where Templates are stored
+	GenerateTemplateRepositoryConnectionParameters func() (
+		templateRepositoryConnectionParameters *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters)
 }
 
 // ConnectorFunctionsToDoCallBackOn

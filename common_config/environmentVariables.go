@@ -49,11 +49,9 @@ var (
 	// URL to Proxy-server for outgoing requests
 	ProxyServerURL string
 
-	// ShouldSpireServerBeUsedForGettingGcpToken
-	// When running on OpenShift then a SPIRE-server is used to get an auth token from GCP
-	ShouldSpireServerBeUsedForGettingGcpToken bool
+	// GitHubApiKey
+	// The key used to access GitHub for reading files
+	GitHubApiKeysAsString string
 
-	// OpenShiftsGcpTokenSourceUrl
-	// URL to OpenShift's GCP-token source
-	OpenShiftsGcpTokenSourceUrl string
+	GitHubApiKeys []string
 )

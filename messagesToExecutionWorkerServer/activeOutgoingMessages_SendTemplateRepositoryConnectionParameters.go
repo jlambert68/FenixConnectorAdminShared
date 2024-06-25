@@ -28,7 +28,6 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 	templateRepositoryConnectionParameters = common_config.ConnectorFunctionsToDoCallBackOn.GenerateTemplateRepositoryConnectionParameters()
 
 	// Convert into gRPC-message by looping incomming message
-	var templateRepositoryConnectionParametersAsGrpc *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
 	var allTemplateRepositories []*fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters
 	for messageIndex, repositoryConnectionParameters := range templateRepositoryConnectionParameters.TemplatePaths {
 
@@ -46,9 +45,6 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 		allTemplateRepositories = append(allTemplateRepositories, tempAllTemplateRepositories)
 	}
 
-	// Add AllTemplateRepositories to gRPC-TemplateRepositoryConnectionParameters-message
-	templateRepositoryConnectionParametersAsGrpc.AllTemplateRepositories = allTemplateRepositories
-
 	// Add Domain-information
 	var tempClientSystemIdentificationMessage *fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage
 	tempClientSystemIdentificationMessage = &fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage{
@@ -58,7 +54,12 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 			common_config.GetHighestExecutionWorkerProtoFileVersion()),
 	}
 
-	templateRepositoryConnectionParametersAsGrpc.ClientSystemIdentification = tempClientSystemIdentificationMessage
+	// Create the full gRPC-message
+	var templateRepositoryConnectionParametersAsGrpc *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
+	templateRepositoryConnectionParametersAsGrpc = &fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters{
+		ClientSystemIdentification: tempClientSystemIdentificationMessage,
+		AllTemplateRepositories:    allTemplateRepositories,
+	}
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers,
 	// Allowed User and TemplateRepositoryConnectionParameters to Worker. If not then just exit

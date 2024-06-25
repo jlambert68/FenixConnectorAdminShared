@@ -34,11 +34,12 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 		// Create one url to a Template repository
 		var tempAllTemplateRepositories *fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters
 		tempAllTemplateRepositories = &fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters{
-			RepositoryApiUrl: repositoryConnectionParameters.RepositoryApiUrl,
-			RepositoryOwner:  repositoryConnectionParameters.RepositoryOwner,
-			RepositoryName:   repositoryConnectionParameters.RepositoryName,
-			RepositoryPath:   repositoryConnectionParameters.RepositoryPath,
-			GitHubApiKey:     common_config.GitHubApiKeys[messageIndex],
+			RepositoryApiUrlName: repositoryConnectionParameters.RepositoryApiUrlName,
+			RepositoryApiUrl:     repositoryConnectionParameters.RepositoryApiUrl,
+			RepositoryOwner:      repositoryConnectionParameters.RepositoryOwner,
+			RepositoryName:       repositoryConnectionParameters.RepositoryName,
+			RepositoryPath:       repositoryConnectionParameters.RepositoryPath,
+			GitHubApiKey:         common_config.GitHubApiKeys[messageIndex],
 		}
 
 		// Add it to the gRPC-message

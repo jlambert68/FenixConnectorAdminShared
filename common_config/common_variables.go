@@ -24,9 +24,10 @@ type StopAliveToWorkerTickerChannelStruct struct {
 // Struct used when unmarshalling Github ApiUrl-parameters
 type RepositoryTemplatePathStruct struct {
 	TemplatePaths []struct {
-		RepositoryApiUrl string `json:"RepositoryApiUrl"`
-		RepositoryOwner  string `json:"RepositoryOwner"`
-		RepositoryName   string `json:"RepositoryName"`
-		RepositoryPath   string `json:"RepositoryPath"`
+		RepositoryApiUrlName string `json:"RepositoryApiUrlName"`
+		RepositoryApiUrl     string `json:"RepositoryApiUrl"`
+		RepositoryOwner      string `json:"RepositoryOwner"`
+		RepositoryName       string `json:"RepositoryName"`
+		RepositoryPath       string `json:"RepositoryPath"`
 	} `json:"TemplatePaths"`
 }

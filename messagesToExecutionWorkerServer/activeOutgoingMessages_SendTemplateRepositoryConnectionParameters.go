@@ -29,6 +29,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 
 	// Convert into gRPC-message by looping incomming message
 	var templateRepositoryConnectionParametersAsGrpc *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
+	var allTemplateRepositories []*fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters
 	for messageIndex, repositoryConnectionParameters := range templateRepositoryConnectionParameters.TemplatePaths {
 
 		// Create one url to a Template repository
@@ -42,10 +43,11 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 		}
 
 		// Add it to the gRPC-message
-		templateRepositoryConnectionParametersAsGrpc.AllTemplateRepositories = append(
-			templateRepositoryConnectionParametersAsGrpc.GetAllTemplateRepositories(),
-			tempAllTemplateRepositories)
+		allTemplateRepositories = append(allTemplateRepositories, tempAllTemplateRepositories)
 	}
+
+	// Add AllTemplateRepositories to gRPC-TemplateRepositoryConnectionParameters-message
+	templateRepositoryConnectionParametersAsGrpc.AllTemplateRepositories = allTemplateRepositories
 
 	// Add Domain-information
 	var tempClientSystemIdentificationMessage *fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage

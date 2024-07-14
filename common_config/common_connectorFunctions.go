@@ -35,6 +35,10 @@ type ConnectorCallBackFunctionsStruct struct {
 	// Sends this Github url parameters to where Templates are stored
 	GenerateTemplateRepositoryConnectionParameters func() (
 		templateRepositoryConnectionParameters *RepositoryTemplatePathStruct)
+
+	// Sends "Simple" TestData towards TestCaseBuilderServer
+	GenerateSimpleTestData func() (
+		simpleTestData []*fenixExecutionWorkerGrpcApi.TestDataFromOneSimpleTestDataAreaFileMessage)
 }
 
 // ConnectorFunctionsToDoCallBackOn

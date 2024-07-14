@@ -101,6 +101,10 @@ func fenixExecutionConnectorMain() {
 		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 			SendTemplateRepositoryConnectionParameters()
 
+		// Send 'simple' TestData to Worker
+		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
+			SendSimpleTestData()
+
 		// Should there be any communication out from Connector
 		if common_config.TurnOffAllCommunicationWithWorker == false {
 

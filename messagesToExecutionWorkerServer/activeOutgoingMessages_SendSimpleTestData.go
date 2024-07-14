@@ -27,6 +27,11 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSimple
 	var simpleTestData []*fenixExecutionWorkerGrpcApi.TestDataFromOneSimpleTestDataAreaFileMessage
 	simpleTestData = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSimpleTestData()
 
+	// If there are no "Simple" TestData then just exist
+	if simpleTestData == nil {
+		return
+	}
+
 	// Add Domain-information
 	var tempClientSystemIdentificationMessage *fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage
 	tempClientSystemIdentificationMessage = &fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage{

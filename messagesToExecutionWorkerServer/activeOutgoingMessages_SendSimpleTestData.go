@@ -5,6 +5,8 @@ import (
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
+	"github.com/jlambert68/FenixScriptEngine/testDataEngine"
+	"github.com/jlambert68/FenixSyncShared"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -23,13 +25,80 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSimple
 
 	var err error
 
-	// Do call-back to get all 	// Create supported TestInstructions, TestInstructionContainers and Allowed Users
-	var simpleTestData []*fenixExecutionWorkerGrpcApi.TestDataFromOneSimpleTestDataAreaFileMessage
+	// Do call-back to get all 'Simple' TestData
+
+	var simpleTestData []*testDataEngine.TestDataFromSimpleTestDataAreaStruct
 	simpleTestData = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSimpleTestData()
 
 	// If there are no "Simple" TestData then just exist
 	if simpleTestData == nil {
 		return
+	}
+
+	// Generate gRPC-message for Simple TestData-message
+	var simpleTestDataAsGrpcMessage []*fenixExecutionWorkerGrpcApi.TestDataFromOneSimpleTestDataAreaFileMessage
+	for _, tempTestDataFromSimpleTestDataArea := range simpleTestData {
+
+		// Generate Headers for gRPC-message
+		var headersForTestDataFromOneSimpleTestDataAreaFileForGrpc []*fenixExecutionWorkerGrpcApi.
+			HeaderForTestDataFromOneSimpleTestDataAreaFileMessage
+		for _, header := range tempTestDataFromSimpleTestDataArea.Headers {
+			var headerForTestDataFromOneSimpleTestDataAreaFileForGrpc *fenixExecutionWorkerGrpcApi.
+				HeaderForTestDataFromOneSimpleTestDataAreaFileMessage
+			headerForTestDataFromOneSimpleTestDataAreaFileForGrpc = &fenixExecutionWorkerGrpcApi.
+				HeaderForTestDataFromOneSimpleTestDataAreaFileMessage{
+				ShouldHeaderActAsFilter: header.ShouldHeaderActAsFilter,
+				HeaderName:              header.HeaderName,
+				HeaderUiName:            header.HeaderName,
+			}
+
+			headersForTestDataFromOneSimpleTestDataAreaFileForGrpc = append(
+				headersForTestDataFromOneSimpleTestDataAreaFileForGrpc,
+				headerForTestDataFromOneSimpleTestDataAreaFileForGrpc)
+		}
+
+		// Generate the TestData-rows for gRPC-message
+		var simpleTestDataRowMessageAsGrpc []*fenixExecutionWorkerGrpcApi.SimpleTestDataRowMessage
+		var testDataValuesToBeHashed []string
+		for _, tempTestDataRow := range tempTestDataFromSimpleTestDataArea.TestDataRows {
+
+			// Convert one row of data into gRPC-version
+			var tempTestDataRowAsGrpc *fenixExecutionWorkerGrpcApi.SimpleTestDataRowMessage
+			tempTestDataRowAsGrpc = &fenixExecutionWorkerGrpcApi.SimpleTestDataRowMessage{TestDataValue: tempTestDataRow}
+
+			// Add to slice with all TestData to be hashed
+			testDataValuesToBeHashed = append(testDataValuesToBeHashed, tempTestDataRow...)
+
+			// Add row to slice of rows
+			simpleTestDataRowMessageAsGrpc = append(simpleTestDataRowMessageAsGrpc, tempTestDataRowAsGrpc)
+		}
+
+		// Generate ImportantDataInFileSha256Hash
+		var importantDataInFileSha256Hash string
+		var valuesToHash []string
+		valuesToHash = []string{
+			tempTestDataFromSimpleTestDataArea.TestDataDomainUuid,
+			tempTestDataFromSimpleTestDataArea.TestDataAreaUuid,
+		}
+		valuesToHash = append(valuesToHash, testDataValuesToBeHashed...)
+		importantDataInFileSha256Hash = fenixSyncShared.HashValues(valuesToHash, true)
+
+		// Create the full gRPC-message
+		var oneSimpleTestDataAsGrpcMessage *fenixExecutionWorkerGrpcApi.TestDataFromOneSimpleTestDataAreaFileMessage
+		oneSimpleTestDataAsGrpcMessage = &fenixExecutionWorkerGrpcApi.TestDataFromOneSimpleTestDataAreaFileMessage{
+			TestDataDomainUuid:         tempTestDataFromSimpleTestDataArea.TestDataDomainUuid,
+			TestDataDomainName:         tempTestDataFromSimpleTestDataArea.TestDataDomainName,
+			TestDataDomainTemplateName: tempTestDataFromSimpleTestDataArea.TestDataDomainTemplateName,
+			TestDataAreaUuid:           tempTestDataFromSimpleTestDataArea.TestDataAreaUuid,
+			TestDataAreaName:           tempTestDataFromSimpleTestDataArea.TestDataAreaName,
+			HeadersForTestDataFromOneSimpleTestDataAreaFile: headersForTestDataFromOneSimpleTestDataAreaFileForGrpc,
+			SimpleTestDataRows:            simpleTestDataRowMessageAsGrpc,
+			TestDataFileSha256Hash:        tempTestDataFromSimpleTestDataArea.TestDataFileSha256Hash,
+			ImportantDataInFileSha256Hash: importantDataInFileSha256Hash,
+		}
+
+		// Append to slice
+		simpleTestDataAsGrpcMessage = append(simpleTestDataAsGrpcMessage, oneSimpleTestDataAsGrpcMessage)
 	}
 
 	// Add Domain-information
@@ -45,7 +114,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSimple
 	var testDataFromSimpleTestDataAreaFileMessageAsGrpc *fenixExecutionWorkerGrpcApi.TestDataFromSimpleTestDataAreaFileMessage
 	testDataFromSimpleTestDataAreaFileMessageAsGrpc = &fenixExecutionWorkerGrpcApi.TestDataFromSimpleTestDataAreaFileMessage{
 		ClientSystemIdentification:          tempClientSystemIdentificationMessage,
-		TestDataFromSimpleTestDataAreaFiles: simpleTestData,
+		TestDataFromSimpleTestDataAreaFiles: simpleTestDataAsGrpcMessage,
 	}
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers,

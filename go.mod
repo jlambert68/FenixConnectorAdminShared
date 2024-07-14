@@ -1,6 +1,8 @@
 module github.com/jlambert68/FenixConnectorAdminShared
 
-go 1.21
+go 1.22
+
+toolchain go1.22.4
 
 //toolchain go1.21.5
 
@@ -9,7 +11,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/pat v1.0.2
 	github.com/gorilla/sessions v1.3.0
-	github.com/jlambert68/FenixGrpcApi v0.0.0-20240714103659-968bb6de03c8
+	github.com/jlambert68/FenixGrpcApi v0.0.0-20240714144145-01c22e77a049
+	github.com/jlambert68/FenixScriptEngine v0.0.0-20240714192056-0f60db456876
 	github.com/jlambert68/FenixSyncShared v0.0.0-20240215140904-db0840b5d70a
 	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20240312181725-d712a9d80efe
 	github.com/markbates/goth v1.80.0

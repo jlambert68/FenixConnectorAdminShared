@@ -51,6 +51,11 @@ var tempKeyAsHash string
 func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (
 	appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
+	// Set Key for NewCookieStore
+	if len(tempKeyAsHash) == 0 {
+		tempKeyAsHash = fenixSyncShared.HashSingleValue(uuidGenerator.New().String())
+	}
+
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
 

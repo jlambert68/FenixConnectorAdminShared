@@ -209,18 +209,18 @@ var DoneChannel chan bool
 func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.Context) (appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
 	// Secure that User is initiated
-	gcp.initiateUserObject()
+	gcp.initiateUserObjectPubSub()
 
 	// Only create the token if there is none, or it has expired (or 5 minutes before expiration
 	var safetyDuration time.Duration
 	safetyDuration = -5 * time.Minute
-	timeToCompareTo := gcp.gcpAccessTokenForAuthorizedAccountsPubSub.ExpiresAt.Add(safetyDuration)
-	if gcp.gcpAccessTokenForAuthorizedAccountsPubSub.IDToken != "" && timeToCompareTo.Before(time.Now()) {
+	timeToCompareTo := gcp.gcpAccessTokenForAuthorizedAccounts.ExpiresAt.Add(safetyDuration)
+	if gcp.gcpAccessTokenForAuthorizedAccounts.IDToken != "" && timeToCompareTo.Before(time.Now()) {
 		// We already have a ID-token that can be used, so return that
 		appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForAuthorizedAccounts.IDToken)
 
 		return appendedCtx, true, ""
-	} else if gcp.gcpAccessTokenForAuthorizedAccountsPubSub.IDToken != "" && timeToCompareTo.After(time.Now()) {
+	} else if gcp.gcpAccessTokenForAuthorizedAccounts.IDToken != "" && timeToCompareTo.After(time.Now()) {
 		// Update with new token
 
 	}

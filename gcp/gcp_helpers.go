@@ -211,6 +211,15 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 	// Secure that User is initiated
 	gcp.initiateUserObjectPubSub()
 
+	router := pat.New()
+	var url string
+
+	// Initiate http server
+	localWebServer := &http.Server{
+		Addr:    ":3000",
+		Handler: router,
+	}
+
 	// Only create the token if there is none, or it has expired (or 5 minutes before expiration
 	var safetyDuration time.Duration
 	safetyDuration = -5 * time.Minute
@@ -247,8 +256,6 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 			"http://localhost:3000/auth/google/callback",
 			"email", "profile", "https://www.googleapis.com/auth/pubsub"),
 	)
-
-	router := pat.New()
 
 	router.Get("/auth/{provider}/callback", func(res http.ResponseWriter, req *http.Request) {
 
@@ -288,14 +295,8 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 	// Initiate channel used to stop server
 	DoneChannel = make(chan bool, 1)
 
-	// Initiate http server
-	localWebServer := &http.Server{
-		Addr:    ":3000",
-		Handler: router,
-	}
-
 	// Start Local Web Server as go routine
-	url := "http://localhost:3000"
+	url = "http://localhost:3000"
 	go gcp.startLocalWebServer(localWebServer, url)
 
 	common_config.Logger.WithFields(logrus.Fields{

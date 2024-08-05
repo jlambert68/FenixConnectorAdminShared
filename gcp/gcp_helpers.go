@@ -245,7 +245,7 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 			common_config.AuthClientId,
 			common_config.AuthClientSecret,
 			"http://localhost:3000/auth/google/callback",
-			"email", "profile"),
+			"email", "profile", "https://www.googleapis.com/auth/pubsub"),
 	)
 
 	router := pat.New()

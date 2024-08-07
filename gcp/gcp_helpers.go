@@ -47,6 +47,10 @@ const (
 func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTarget GenerateTokenTargetType) (
 	appendedCtx context.Context, returnAckNack bool, returnMessage string) {
 
+	if len(gcp.sessionSecret) == 0 {
+		gcp.sessionSecret = uuidGenerator.New().String()
+	}
+
 	// Chose correct method for authentication
 	switch tokenTarget { // common_config.UseServiceAccount == true {
 
@@ -236,9 +240,9 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUser(ctx context.
 
 	// Need to create a new ID-token
 
-	key := uuidGenerator.New().String() // Replace with your SESSION_SECRET or similar
-	maxAge := 86400 * 30                // 30 days
-	isProd := false                     // Set to true when serving over https
+	key := gcp.sessionSecret // Replace with your SESSION_SECRET or similar
+	maxAge := 86400 * 30     // 30 days
+	isProd := false          // Set to true when serving over https
 
 	store := sessions.NewCookieStore([]byte(key))
 	store.MaxAge(maxAge)
@@ -384,9 +388,9 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx co
 
 	// Need to create a new ID-token
 
-	key := uuidGenerator.New().String() // Replace with your SESSION_SECRET or similar
-	maxAge := 86400 * 30                // 30 days
-	isProd := false                     // Set to true when serving over https
+	key := gcp.sessionSecret // Replace with your SESSION_SECRET or similar
+	maxAge := 86400 * 30     // 30 days
+	isProd := false          // Set to true when serving over https
 
 	store := sessions.NewCookieStore([]byte(key))
 	store.MaxAge(maxAge)

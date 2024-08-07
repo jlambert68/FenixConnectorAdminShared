@@ -15,6 +15,8 @@ type GcpObjectStruct struct {
 	gcpAccessTokenForAuthorizedAccountsPubSub goth.User
 
 	refreshTokenResponse *RefreshTokenResponse
+
+	sessionSecret string
 }
 
 var Gcp GcpObjectStruct

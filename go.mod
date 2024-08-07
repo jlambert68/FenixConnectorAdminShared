@@ -10,7 +10,7 @@ require (
 	cloud.google.com/go/pubsub v1.39.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/pat v1.0.2
-	github.com/gorilla/sessions v1.3.0
+	github.com/gorilla/sessions  v1.2.2 // v1.3.0 gives session error when trying to get token from GCP
 	github.com/jlambert68/FenixGrpcApi v0.0.0-20240714144145-01c22e77a049
 	github.com/jlambert68/FenixScriptEngine v0.0.0-20240714192056-0f60db456876
 	github.com/jlambert68/FenixSyncShared v0.0.0-20240215140904-db0840b5d70a

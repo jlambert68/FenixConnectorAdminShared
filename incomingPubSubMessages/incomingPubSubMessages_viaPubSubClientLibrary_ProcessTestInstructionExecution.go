@@ -14,7 +14,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/protobuf/encoding/protojson"
-	"strings"
 )
 
 // PullPubSubTestInstructionExecutionMessagesGcpClientLib
@@ -168,12 +167,14 @@ func PullPubSubTestInstructionExecutionMessagesGcpClientLib(connectorIsReadyToRe
 		var pubSubMessageAsString string
 
 		pubSubMessageAsString = string(pubSubMessage.Data)
-		cleanedMessage = strings.ReplaceAll(pubSubMessageAsString, "\n", "")
+		//cleanedMessage = strings.ReplaceAll(pubSubMessageAsString, "\n", "")
 
 		// Replace '\"' with '"'
-		cleanedMessage = strings.ReplaceAll(cleanedMessage, "\\\"", "\"")
+		//cleanedMessage = strings.ReplaceAll(cleanedMessage, "\\\"", "\"")
 
-		cleanedMessage = strings.ReplaceAll(cleanedMessage, " ", "")
+		//cleanedMessage = strings.ReplaceAll(cleanedMessage, " ", "")
+
+		cleanedMessage = pubSubMessageAsString
 
 		// Convert back into byte-array
 		cleanedMessageAsByteArray = []byte(cleanedMessage)

@@ -9,7 +9,6 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -22,12 +21,14 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 	var pubSubMessageAsString string
 
 	pubSubMessageAsString = string(pubSubMessage)
-	cleanedMessage = strings.ReplaceAll(pubSubMessageAsString, "\n", "")
+	//cleanedMessage = strings.ReplaceAll(pubSubMessageAsString, "\n", "")
 
 	// Replace '\"' with '"'
-	cleanedMessage = strings.ReplaceAll(cleanedMessage, "\\\"", "\"")
+	//cleanedMessage = strings.ReplaceAll(cleanedMessage, "\\\"", "\"")
 
-	cleanedMessage = strings.ReplaceAll(cleanedMessage, " ", "")
+	//cleanedMessage = strings.ReplaceAll(cleanedMessage, " ", "")
+
+	cleanedMessage = pubSubMessageAsString
 
 	// Convert back into byte-array
 	cleanedMessageAsByteArray = []byte(cleanedMessage)

@@ -60,7 +60,7 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 			common_config.ExecutionLocationForFenixExecutionWorkerServer == common_config.GCP {
 
 			// Use Authorized user when targeting GCP from local
-			appendedCtx, returnAckNack, returnMessage = gcp.GenerateGCPAccessTokenForAuthorizedUser(ctx)
+			appendedCtx, returnAckNack, returnMessage = gcp.GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx) //gcp.GenerateGCPAccessTokenForAuthorizedUser(ctx)
 
 		} else {
 			// Use Authorized user

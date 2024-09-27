@@ -72,7 +72,7 @@ func (gcp *GcpObjectStruct) GenerateGCPAccessToken(ctx context.Context, tokenTar
 		if common_config.ExecutionLocationForConnector == common_config.LocalhostNoDocker {
 
 			// Use Authorized user when targeting GCP from local
-			appendedCtx, returnAckNack, returnMessage = gcp.GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx)
+			appendedCtx, returnAckNack, returnMessage = gcp.GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx) //gcp.GenerateGCPAccessTokenForAuthorizedUserPubSub(ctx)
 
 		} else {
 			// Use Authorized user

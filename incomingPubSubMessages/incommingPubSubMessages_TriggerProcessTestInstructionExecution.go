@@ -74,7 +74,7 @@ func triggerProcessTestInstructionExecution(pubSubMessage []byte) (err error) {
 		common_config.Logger.WithFields(logrus.Fields{
 			"Id":                         "31ff2119-3b12-45d8-999c-3b27b5c47894",
 			"string(pubSubMessage.Data)": string(pubSubMessage),
-		}).Error("Message is a duplicate")
+		}).Warning("Message is a duplicate")
 
 		return nil
 	}

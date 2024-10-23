@@ -14,7 +14,7 @@ require (
 	github.com/jlambert68/FenixGrpcApi v0.0.0-20241022175244-86f2f20991d4
 	github.com/jlambert68/FenixScriptEngine v0.0.0-20240926173607-33468503e5cd
 	github.com/jlambert68/FenixSyncShared v0.0.0-20240911064419-da3d922610cb
-	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20241023131031-a5d088bae67f
+	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20241023153649-95c48f5cead9
 	github.com/markbates/goth v1.80.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/net v0.30.0

@@ -1,36 +1,38 @@
 module github.com/jlambert68/FenixConnectorAdminShared
 
-go 1.22
+go 1.23
 
-toolchain go1.22.4
+toolchain go1.23.2
 
 //toolchain go1.21.5
 
 require (
-	cloud.google.com/go/pubsub v1.43.0
+	cloud.google.com/go/pubsub v1.45.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/pat v1.0.2
 	github.com/gorilla/sessions v1.2.2 // v1.3.0 gives session error when trying to get token from GCP
-	github.com/jlambert68/FenixGrpcApi v0.0.0-20240902161440-74b93725d1bc
-	github.com/jlambert68/FenixScriptEngine v0.0.0-20240823133128-e998fc3d4fed
+	github.com/jlambert68/FenixGrpcApi v0.0.0-20241022175244-86f2f20991d4
+	github.com/jlambert68/FenixScriptEngine v0.0.0-20240926173607-33468503e5cd
 	github.com/jlambert68/FenixSyncShared v0.0.0-20240911064419-da3d922610cb
-	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20240830110518-fbce28ce9256
+	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20241023131031-a5d088bae67f
 	github.com/markbates/goth v1.80.0
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/net v0.29.0
+	golang.org/x/net v0.30.0
 	golang.org/x/oauth2 v0.23.0
-	google.golang.org/api v0.197.0
-	google.golang.org/grpc v1.66.1
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/api v0.202.0
+	google.golang.org/grpc v1.67.1
+	google.golang.org/protobuf v1.35.1
 
 )
 
 require (
-	cloud.google.com/go v0.115.1 // indirect
-	cloud.google.com/go/auth v0.9.3 // indirect
+	cloud.google.com/go v0.116.0 // indirect
+	cloud.google.com/go/auth v0.9.8 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
-	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v1.2.0 // indirect
+	cloud.google.com/go/compute/metadata v0.5.2 // indirect
+	cloud.google.com/go/iam v1.2.1 // indirect
+	github.com/decred/dcrd/crypto/blake256 v1.0.1 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -58,13 +60,13 @@ require (
 	go.opentelemetry.io/otel v1.29.0 // indirect
 	go.opentelemetry.io/otel/metric v1.29.0 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
-	golang.org/x/time v0.6.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/time v0.7.0 // indirect
 	gonum.org/v1/gonum v0.15.1 // indirect
-	google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
+	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20241015192408-796eee8c2d53 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
 )

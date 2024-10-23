@@ -27,8 +27,10 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	var err error
 
 	// Do call-back to get all 	// Create supported TestInstructions, TestInstructionContainers and Allowed Users
-	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.TestInstructionsAndTestInstructionsContainersStruct
-	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
+	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers *TestInstructionAndTestInstuctionContainerTypes.
+		TestInstructionsAndTestInstructionsContainersStruct
+	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsers = common_config.ConnectorFunctionsToDoCallBackOn.
+		GenerateSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers()
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers and
 	// Allowed Users to Worker. If not then just exit
@@ -44,7 +46,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Convert supported TestInstructions, TestInstructionContainers and Allowed Users message into a gRPC-Worker version of the message
-	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage *fenixExecutionWorkerGrpcApi.SupportedTestInstructionsAndTestInstructionContainersAndAllowedUsersMessage
+	var supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage *fenixExecutionWorkerGrpcApi.
+		SupportedTestInstructionsAndTestInstructionContainersAndAllowedUsersMessage
 	supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage, err = shared_code.
 		GenerateTestInstructionAndTestInstructionContainerAndUserGrpcWorkerMessage(
 			common_config.ThisDomainsUuid,
@@ -58,7 +61,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Convert back supported TestInstructions, TestInstructionContainers and Allowed Users message from a gRPC-Worker version of the message and check correctness of Hashes
-	var testInstructionsAndTestInstructionContainersFromGrpcWorkerMessage *TestInstructionAndTestInstuctionContainerTypes.TestInstructionsAndTestInstructionsContainersStruct
+	var testInstructionsAndTestInstructionContainersFromGrpcWorkerMessage *TestInstructionAndTestInstuctionContainerTypes.
+		TestInstructionsAndTestInstructionsContainersStruct
 	testInstructionsAndTestInstructionContainersFromGrpcWorkerMessage, err = shared_code.
 		GenerateStandardFromGrpcWorkerMessageForTestInstructionsAndUsers(
 			supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage)

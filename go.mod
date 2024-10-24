@@ -11,10 +11,10 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/pat v1.0.2
 	github.com/gorilla/sessions v1.2.2 // v1.3.0 gives session error when trying to get token from GCP
-	github.com/jlambert68/FenixGrpcApi v0.0.0-20241022175244-86f2f20991d4
+	github.com/jlambert68/FenixGrpcApi v0.0.0-20241024112839-e9bc605c05df
 	github.com/jlambert68/FenixScriptEngine v0.0.0-20240926173607-33468503e5cd
 	github.com/jlambert68/FenixSyncShared v0.0.0-20240911064419-da3d922610cb
-	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20241024080234-e3febbebe27a
+	github.com/jlambert68/FenixTestInstructionsAdminShared v0.0.0-20241024120558-b5bcbcf2da45
 	github.com/markbates/goth v1.80.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/net v0.30.0
@@ -30,7 +30,7 @@ require (
 	cloud.google.com/go/auth v0.9.9 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
-	cloud.google.com/go/iam v1.2.1 // indirect
+	cloud.google.com/go/iam v1.2.2 // indirect
 	github.com/decred/dcrd/crypto/blake256 v1.0.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

@@ -5,7 +5,10 @@ import (
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
+	fenixSyncShared "github.com/jlambert68/FenixSyncShared"
+	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
 	"time"
 )
 
@@ -55,11 +58,63 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 			common_config.GetHighestExecutionWorkerProtoFileVersion()),
 	}
 
+	// Create and sign message
+	var messageHashToSign string
+	var hashesToHash []string
+
+	// Loop all Template-data and convert into json
+	for _, tempTemplateRepository := range allTemplateRepositories {
+		var tempTemplateRepositoryAsJson string
+		tempTemplateRepositoryAsJson = protojson.Format(tempTemplateRepository)
+
+		// Append to slice to be hashed
+		hashesToHash = append(hashesToHash, tempTemplateRepositoryAsJson)
+
+	}
+
+	// Create a hash of the slice
+	messageHashToSign = fenixSyncShared.HashValues(hashesToHash, true)
+
+	// Sign the message
+	var signatureToVerifyAsBase64String string
+	signatureToVerifyAsBase64String, err = shared_code.SignMessageUsingSchnorrSignature(messageHashToSign)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "c1dcbe9d-5b5b-430e-9962-55dc5f313972",
+			"err": err,
+		}).Fatalln("Couldn't sign Message")
+	}
+
+	// Generate the public key used to verify the signature
+	var publicKeyAsBase64String string
+	publicKeyAsBase64String, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKey()
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "fe0f9d48-5536-478f-a73f-c194faf7b0ae",
+			"err": err,
+		}).Fatalln("Couldn't generate Public key from Private key Message")
+	}
+	// Verify Signature
+	err = shared_code.VerifySchnorrSignature(messageHashToSign, publicKeyAsBase64String, signatureToVerifyAsBase64String)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "418c970e-6c41-4eb3-83e1-dbc5b6f0343c",
+			"err": err,
+		}).Fatalln("Couldn't verify the Signature")
+	}
+
+	var messageSignatureData *fenixExecutionWorkerGrpcApi.MessageSignatureDataMessage
+	messageSignatureData = &fenixExecutionWorkerGrpcApi.MessageSignatureDataMessage{
+		HashToBeSigned: messageHashToSign,
+		Signature:      signatureToVerifyAsBase64String,
+	}
+
 	// Create the full gRPC-message
 	var templateRepositoryConnectionParametersAsGrpc *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
 	templateRepositoryConnectionParametersAsGrpc = &fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters{
 		ClientSystemIdentification: tempClientSystemIdentificationMessage,
 		AllTemplateRepositories:    allTemplateRepositories,
+		MessageSignatureData:       messageSignatureData,
 	}
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers,

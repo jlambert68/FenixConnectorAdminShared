@@ -7,7 +7,9 @@ import (
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	"github.com/jlambert68/FenixScriptEngine/testDataEngine"
 	"github.com/jlambert68/FenixSyncShared"
+	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
 	"time"
 )
 
@@ -110,11 +112,63 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSimple
 			common_config.GetHighestExecutionWorkerProtoFileVersion()),
 	}
 
+	// Create and sign message
+	var messageHashToSign string
+	var hashesToHash []string
+
+	// Loop all TestData and convert into json
+	for _, tempTestData := range simpleTestDataAsGrpcMessage {
+		var tempTestDataAsJson string
+		tempTestDataAsJson = protojson.Format(tempTestData)
+
+		// Append to slice to be hashed
+		hashesToHash = append(hashesToHash, tempTestDataAsJson)
+
+	}
+
+	// Create a hash of the slice
+	messageHashToSign = fenixSyncShared.HashValues(hashesToHash, true)
+
+	// Sign the message
+	var signatureToVerifyAsBase64String string
+	signatureToVerifyAsBase64String, err = shared_code.SignMessageUsingSchnorrSignature(messageHashToSign)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "acd02d74-785f-497e-80fb-98b539e755b1",
+			"err": err,
+		}).Fatalln("Couldn't sign Message")
+	}
+
+	// Generate the public key used to verify the signature
+	var publicKeyAsBase64String string
+	publicKeyAsBase64String, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKey()
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "d2ea02e5-b48a-45a7-8fc2-5bd65f298a45",
+			"err": err,
+		}).Fatalln("Couldn't generate Public key from Private key Message")
+	}
+	// Verify Signature
+	err = shared_code.VerifySchnorrSignature(messageHashToSign, publicKeyAsBase64String, signatureToVerifyAsBase64String)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "7c574dd4-747e-4efa-a703-6d66837c95e1",
+			"err": err,
+		}).Fatalln("Couldn't verify the Signature")
+	}
+
+	var messageSignatureData *fenixExecutionWorkerGrpcApi.MessageSignatureDataMessage
+	messageSignatureData = &fenixExecutionWorkerGrpcApi.MessageSignatureDataMessage{
+		HashToBeSigned: messageHashToSign,
+		Signature:      signatureToVerifyAsBase64String,
+	}
+
 	// Create the full gRPC-message
 	var testDataFromSimpleTestDataAreaFileMessageAsGrpc *fenixExecutionWorkerGrpcApi.TestDataFromSimpleTestDataAreaFileMessage
 	testDataFromSimpleTestDataAreaFileMessageAsGrpc = &fenixExecutionWorkerGrpcApi.TestDataFromSimpleTestDataAreaFileMessage{
 		ClientSystemIdentification:          tempClientSystemIdentificationMessage,
 		TestDataFromSimpleTestDataAreaFiles: simpleTestDataAsGrpcMessage,
+		MessageSignatureData:                messageSignatureData,
 	}
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers,

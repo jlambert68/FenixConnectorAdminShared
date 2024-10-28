@@ -3,6 +3,7 @@ package fenixConnectorAdminShared
 import (
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
+	"github.com/jlambert68/FenixConnectorAdminShared/privateKeyManager"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"time"
@@ -44,6 +45,9 @@ func InitiateFenixConnectorAdminShared(
 
 		}
 	}
+
+	// Check if new PrivateKey should be generated and stored in secret Manager
+	privateKeyManager.ShouldNewPrivateKeyBeGenerated()
 
 	// Start Connector Engine
 	fenixExecutionConnectorMain()

@@ -3,6 +3,7 @@ package fenixConnectorAdminShared
 import (
 	"fmt"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
+	"github.com/jlambert68/FenixConnectorAdminShared/privateKeyManager"
 	"github.com/jlambert68/FenixSyncShared/environmentVariables"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -233,4 +234,6 @@ func fenixConnectorAdminSharedInit() {
 	// Use the strings.Split function to split the string into a slice
 	common_config.GitHubApiKeys = strings.Split(common_config.GitHubApiKeysAsString, ";")
 
+	// Load environment variables for PrivateKey-manager
+	privateKeyManager.Init()
 }

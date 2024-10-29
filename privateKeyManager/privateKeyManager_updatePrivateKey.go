@@ -29,9 +29,12 @@ func ShouldNewPrivateKeyBeGenerated() {
 		// Secure that there is a "latest version".
 		// One scenario when this is not the case is the first time when deployed
 		var secretManagerPath string
+		var privateKeyFromSecretmanager string
 		secretManagerPath = fmt.Sprintf(secretManagerPathForPrivateKey,
 			common_config.GcpProject) + latestSecretVersion
-		_, err = AccessSecretVersion(secretManagerPath)
+		privateKeyFromSecretmanager, err = AccessSecretVersion(secretManagerPath)
+
+		fmt.Println("privateKeyFromSecretmanager:", privateKeyFromSecretmanager)
 
 		if err != nil {
 			common_config.Logger.WithFields(logrus.Fields{
@@ -50,6 +53,8 @@ func ShouldNewPrivateKeyBeGenerated() {
 		var privateKeyFromEnvironmentVariables string
 		privateKeyFromEnvironmentVariables = environmentVariables.
 			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("PrivateKey")
+
+		fmt.Println("privateKeyFromEnvironmentVariables:", privateKeyFromEnvironmentVariables)
 
 		var publicKey string
 		publicKey, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKeyInput(privateKeyFromEnvironmentVariables)

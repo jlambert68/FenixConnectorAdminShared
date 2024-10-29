@@ -41,4 +41,4 @@ const latestSecretVersion = "/versions/latest"
 // Path to the first secret
 const firstSecretVersion = "/versions/1"
 
-const secretManagerPathForPrivateKey = "projects/%s-%s/secrets/private-key"
+const secretManagerPathForPrivateKey = "projects/%s/secrets/private-key"

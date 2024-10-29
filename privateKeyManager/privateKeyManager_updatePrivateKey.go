@@ -30,7 +30,7 @@ func ShouldNewPrivateKeyBeGenerated() {
 		// One scenario when this is not the case is the first time when deployed
 		var secretManagerPath string
 		secretManagerPath = fmt.Sprintf(secretManagerPathForPrivateKey,
-			common_config.GcpProject, executionEnvironmentAsString)
+			common_config.GcpProject) + latestSecretVersion
 		_, err = AccessSecretVersion(secretManagerPath)
 
 		if err != nil {
@@ -97,7 +97,7 @@ func generateNewPrivatePublicKeyPar() {
 	// Store New Private Key in Secret Manager
 	var secretManagerPath string
 	secretManagerPath = fmt.Sprintf(secretManagerPathForPrivateKey,
-		common_config.GcpProject, executionEnvironmentAsString)
+		common_config.GcpProject)
 
 	_, err = AddSecretVersion(secretManagerPath, privateKey)
 	if err != nil {

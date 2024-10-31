@@ -22,39 +22,49 @@ func ShouldNewPrivateKeyBeGenerated() {
 
 		// Generates a new Private-Public key par and exits the application for user to be able to update
 		// Fenix Database with the new Public key for the Domain
-		generateNewPrivatePublicKeyPar()
+		generateNewPrivatePublicKeyParInGcpSecretManager()
 
 	} else {
 
-		// Secure that there is a "latest version".
-		// One scenario when this is not the case is the first time when deployed
-		var secretManagerPath string
-		var privateKeyFromSecretmanager string
-		secretManagerPath = fmt.Sprintf(secretManagerPathForPrivateKey,
-			common_config.GcpProject) + latestSecretVersion
-		privateKeyFromSecretmanager, err = AccessSecretVersion(secretManagerPath)
+		// Only done in GCP
+		if common_config.ExecutionLocationForConnector == common_config.GCP &&
+			executionEnvironmentPlatform == executionEnvironmentPlatformGCP {
 
-		fmt.Println("privateKeyFromSecretmanager:", privateKeyFromSecretmanager)
+			// Secure that there is a "latest version".
+			// One scenario when this is not the case is the first time when deployed
+			var secretManagerPath string
+			secretManagerPath = fmt.Sprintf(secretManagerPathForPrivateKey,
+				common_config.GcpProject) + latestSecretVersion
+			_, err = AccessSecretVersion(secretManagerPath)
 
-		if err != nil {
-			common_config.Logger.WithFields(logrus.Fields{
-				"Id":                "76608804-a09e-4e94-9b4f-ebd075b23479",
-				"err":               err,
-				"secretManagerPath": secretManagerPath,
-			}).Info("No latest version for secrete. Will create a new one")
+			if err != nil {
+				common_config.Logger.WithFields(logrus.Fields{
+					"Id":                "76608804-a09e-4e94-9b4f-ebd075b23479",
+					"err":               err,
+					"secretManagerPath": secretManagerPath,
+				}).Info("No latest version for secrete. Will create a new one")
 
-			// Generates a new Private-Public key par and exits the application for user to be able to update
-			// Fenix Database with the new Public key for the Domain
+				// Generates a new Private-Public key par and exit the application for user to be able to update
+				// Fenix Database with the new Public key for the Domain
+				generateNewPrivatePublicKeyParInGcpSecretManager()
+
+			}
+		}
+
+		// Should new Private-Public-key-par be generated (not in GCP)
+		if (executionEnvironment == environmentDev && generateNewPrivateKeyForDev == true) ||
+			(executionEnvironment == environmentAcc && generateNewPrivateKeyForAcc == true) {
+
+			// Generates a new Private-Public key par and exit the application for user to be able to update
+			// Fenix Database with the new Public key for the Domain and set the Private Key as an environment variable
+			// for the Connector
 			generateNewPrivatePublicKeyPar()
-
 		}
 
 		// Get Public Key from existing private key
 		var privateKeyFromEnvironmentVariables string
 		privateKeyFromEnvironmentVariables = environmentVariables.
 			ExtractEnvironmentVariableOrInjectedEnvironmentVariable("PrivateKey")
-
-		fmt.Println("privateKeyFromEnvironmentVariables:", privateKeyFromEnvironmentVariables)
 
 		var publicKey string
 		publicKey, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKeyInput(privateKeyFromEnvironmentVariables)
@@ -75,7 +85,8 @@ func ShouldNewPrivateKeyBeGenerated() {
 
 // Generates a new Private-Public key par and exits the application for user to be able to update
 // Fenix Database with the new Public key for the Domain
-func generateNewPrivatePublicKeyPar() {
+// For GCP
+func generateNewPrivatePublicKeyParInGcpSecretManager() {
 
 	var err error
 
@@ -127,6 +138,44 @@ func generateNewPrivatePublicKeyPar() {
 		"Id":        "b277b744-0fa4-4438-aea9-e47057c298a6",
 		"PublicKey": publicKey,
 	}).Info("Successfully generated and stored new PrivateKey in Secret Manager.")
+
+	// Exiting so public key can be transferred to Fenix Database
+	os.Exit(0)
+
+}
+
+// Generates a new Private-Public key par and exits the application for user to be able to update
+// Fenix Database with the new Public key for the Domain
+func generateNewPrivatePublicKeyPar() {
+
+	var err error
+
+	// Generate Private Key
+	var privateKey string
+	privateKey, err = shared_code.GenerateNewPrivateKeyAsBase64String()
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"Id":  "8a38e3cb-afaa-4bca-82a2-e0da91349f07",
+			"err": err,
+		}).Fatalln("Couldn't generate Private Key, so will exit")
+	}
+
+	// Generate Public Key from private key
+	var publicKey string
+	publicKey, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKeyInput(privateKey)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"Id":  "c63d41df-12ff-4ba7-ac0c-e7cce53fd378",
+			"err": err,
+		}).Fatalln("Couldn't generate Public Key from Private Key, so will exit")
+	}
+
+	// Inform that new PrivateKey was successfully generated
+	common_config.Logger.WithFields(logrus.Fields{
+		"Id":         "9498f7b4-6216-40e7-a845-abef00d802fa",
+		"PublicKey":  publicKey,
+		"PrivateKey": privateKey,
+	}).Info("Successfully generated and new PrivateKey-PublicKey-par.")
 
 	// Exiting so public key can be transferred to Fenix Database
 	os.Exit(0)

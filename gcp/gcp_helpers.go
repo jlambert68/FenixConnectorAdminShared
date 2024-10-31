@@ -140,10 +140,12 @@ func (gcp *GcpObjectStruct) generateGCPAccessToken(ctx context.Context) (appende
 
 	}
 
-	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "52ccc212-601d-409b-a177-28782fa09d6f",
-		//"gcp.gcpAccessTokenForServiceAccounts": gcp.gcpAccessTokenForServiceAccounts,
-	}).Debug("Will use Bearer Token")
+	/*
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID": "52ccc212-601d-409b-a177-28782fa09d6f",
+			//"gcp.gcpAccessTokenForServiceAccounts": gcp.gcpAccessTokenForServiceAccounts,
+		}).Debug("Will use Bearer Token")
+	*/
 
 	// Add token to GrpcServer Request.
 	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccounts.AccessToken)
@@ -194,11 +196,13 @@ func (gcp *GcpObjectStruct) generateGCPAccessTokenPubSub(ctx context.Context) (a
 
 	}
 
-	common_config.Logger.WithFields(logrus.Fields{
-		"ID": "be4b0370-e578-4664-8fd7-4bb5099e6261",
-		"gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry": gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry,
-		"time.Now()": time.Now(),
-	}).Info("Will use Bearer Token")
+	/*
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID": "be4b0370-e578-4664-8fd7-4bb5099e6261",
+			"gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry": gcp.gcpAccessTokenForServiceAccountsPubSub.Expiry,
+			"time.Now()": time.Now(),
+		}).Info("Will use Bearer Token")
+	*/
 
 	// Add token to GrpcServer Request.
 	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+gcp.gcpAccessTokenForServiceAccountsPubSub.AccessToken)

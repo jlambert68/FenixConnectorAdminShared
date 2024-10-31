@@ -19,6 +19,8 @@ import (
 
 // ********************************************************************************************************************
 
+var logCounter int = 0
+
 // SetConnectionToFenixExecutionWorkerServer - Set upp connection and Dial to FenixExecutionServer
 func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SetConnectionToFenixExecutionWorkerServer(ctx context.Context) (_ context.Context, err error) {
 
@@ -105,12 +107,23 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SetConnect
 				return nil, err
 			}
 
+			logCounter = 0
+
 		} else {
 
-			common_config.Logger.WithFields(logrus.Fields{
-				"ID": "47f3939b-f87d-4635-af08-6b4295b3adc3",
-				"common_config.FenixExecutionWorkerAddressToDial": common_config.FenixExecutionWorkerAddressToDial,
-			}).Debug("gRPC connection OK to FenixWorkerServer")
+			if logCounter == 0 {
+
+				common_config.Logger.WithFields(logrus.Fields{
+					"ID": "47f3939b-f87d-4635-af08-6b4295b3adc3",
+					"common_config.FenixExecutionWorkerAddressToDial": common_config.FenixExecutionWorkerAddressToDial,
+				}).Debug("gRPC connection OK to FenixWorkerServer")
+
+			}
+
+			logCounter = logCounter + 1
+			if logCounter > 100 {
+				logCounter = 0
+			}
 
 			// Creates a new Client
 			fenixExecutionWorkerGrpcClient = fenixExecutionWorkerGrpcApi.

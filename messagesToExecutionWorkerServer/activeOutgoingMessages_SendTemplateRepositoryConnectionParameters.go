@@ -9,6 +9,7 @@ import (
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
+	"strings"
 	"time"
 )
 
@@ -66,6 +67,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 	for _, tempTemplateRepository := range allTemplateRepositories {
 		var tempTemplateRepositoryAsJson string
 		tempTemplateRepositoryAsJson = protojson.Format(tempTemplateRepository)
+
+		// Remove spaces in json
+		tempTemplateRepositoryAsJson = strings.ReplaceAll(tempTemplateRepositoryAsJson, " ", "")
 
 		// Append to slice to be hashed
 		hashesToHash = append(hashesToHash, tempTemplateRepositoryAsJson)

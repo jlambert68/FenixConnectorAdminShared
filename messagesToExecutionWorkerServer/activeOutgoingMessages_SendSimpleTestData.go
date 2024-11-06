@@ -10,6 +10,7 @@ import (
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
+	"strings"
 	"time"
 )
 
@@ -120,6 +121,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSimple
 	for _, tempTestData := range simpleTestDataAsGrpcMessage {
 		var tempTestDataAsJson string
 		tempTestDataAsJson = protojson.Format(tempTestData)
+
+		// Remove spaces in json
+		tempTestDataAsJson = strings.ReplaceAll(tempTestDataAsJson, " ", "")
 
 		// Append to slice to be hashed
 		hashesToHash = append(hashesToHash, tempTestDataAsJson)

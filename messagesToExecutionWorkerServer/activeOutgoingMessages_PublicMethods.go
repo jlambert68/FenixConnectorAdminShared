@@ -34,7 +34,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) ConnectorI
 	}
 
 	// Set up ticker to send I'm alive to Worker
-	ticker := time.NewTicker(15 * time.Second)
+	ticker := time.NewTicker(24 * time.Hour)
 
 	// Send a Message to Worker that Connector is Ready, every 15 seconds until program exists
 	var exitForLoop bool

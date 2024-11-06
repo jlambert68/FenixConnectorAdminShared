@@ -103,6 +103,13 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendTempla
 		}).Fatalln("Couldn't verify the Signature")
 	}
 
+	common_config.Logger.WithFields(logrus.Fields{
+		"ID":                              "4c0b1960-2f12-4fd1-ae9b-3b10f3a34764",
+		"messageHashToSign":               messageHashToSign,
+		"publicKeyAsBase64String":         publicKeyAsBase64String,
+		"signatureToVerifyAsBase64String": signatureToVerifyAsBase64String,
+	}).Info("Message to be signed, Signature and public key")
+
 	var messageSignatureData *fenixExecutionWorkerGrpcApi.MessageSignatureDataMessage
 	messageSignatureData = &fenixExecutionWorkerGrpcApi.MessageSignatureDataMessage{
 		HashToBeSigned: messageHashToSign,

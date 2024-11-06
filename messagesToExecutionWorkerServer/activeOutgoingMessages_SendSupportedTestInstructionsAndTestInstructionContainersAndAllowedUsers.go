@@ -88,6 +88,23 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 			"in 'SendSupportedTestInstructionsAndTestInstructionContainersAndAllowedUsers'")
 	}
 
+	// Generate the public key used to verify the signature
+	var publicKeyAsBase64String string
+	publicKeyAsBase64String, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKey()
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "d5a6735d-22ed-4de7-a2c8-231c9109f3cb",
+			"err": err,
+		}).Fatalln("Couldn't generate Public key from Private key Message")
+	}
+
+	common_config.Logger.WithFields(logrus.Fields{
+		"ID":                              "0ef03b7c-cd65-4065-b503-78e25bae2dd6",
+		"messageHashToSign":               supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage.MessageSignatureData.GetHashToBeSigned(),
+		"publicKeyAsBase64String":         publicKeyAsBase64String,
+		"signatureToVerifyAsBase64String": supportedTestInstructionsAndTestInstructionContainersAndAllowedUsersGrpcWorkerMessage.MessageSignatureData.GetSignature(),
+	}).Info("Message to be signed, Signature and public key")
+
 	// When there should be no traffic towards Worker then just return
 	if common_config.TurnOffAllCommunicationWithWorker == true {
 		return

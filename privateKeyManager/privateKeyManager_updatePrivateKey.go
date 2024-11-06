@@ -79,7 +79,7 @@ func ShouldNewPrivateKeyBeGenerated() {
 		common_config.Logger.WithFields(logrus.Fields{
 			"Id":        "45c87663-0ce8-4b0d-81c0-3088131a508a",
 			"PublicKey": publicKey,
-		}).Info("Will use existing Private Key in in Secret Manager.")
+		}).Info("Will use existing Private Key.")
 	}
 }
 

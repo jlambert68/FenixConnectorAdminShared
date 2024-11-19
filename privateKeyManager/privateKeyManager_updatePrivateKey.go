@@ -69,10 +69,16 @@ func ShouldNewPrivateKeyBeGenerated() {
 		var publicKey string
 		publicKey, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKeyInput(privateKeyFromEnvironmentVariables)
 		if err != nil {
+
 			common_config.Logger.WithFields(logrus.Fields{
-				"Id":  "8d332de0-dfe9-48b5-80b7-c87db6307157",
+				"Id":  "723ec3ce-5741-40aa-86ad-5df7e53dbadb",
 				"err": err,
-			}).Fatalln("Couldn't generate Public Key from Private Key, so will exit")
+			}).Warning("Couldn't generate Public Key from Private Key, Generate a new Private Key and retry to Generate the public key from the new one")
+
+			// If there are any problem generating the public key from the Private key, then create a new private key
+			// This can happen in GCP when the environment is first set up
+			generateNewPrivatePublicKeyParInGcpSecretManager()
+
 		}
 
 		// Inform of used Public key

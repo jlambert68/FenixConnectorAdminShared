@@ -35,7 +35,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	supportedMetaDataAsString = string(*supportedMetaDataAsByteSlice)
 
 	// Verify json towards json-schema
-	err = supportedMetaData.ValidateSupportedMetaDataJsonTowardsJsonSchema(&supportedMetaDataAsString)
+	err = supportedMetaData.ValidateSupportedMetaDataJsonTowardsJsonSchema(supportedMetaDataAsByteSlice)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
 			"ID":  "a16a25f3-5f09-4dd3-aac8-e1971baa6413",

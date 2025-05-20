@@ -1,12 +1,10 @@
 package supportedMetaData
 
 import (
-
 	_ "embed"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	"github.com/sirupsen/logrus"
-
 )
 
 //go:embed json-schema/supportedMetaData.json-schema.json
@@ -53,11 +51,11 @@ func ValidateSupportedMetaDataJsonTowardsJsonSchema(
 	} else {
 		// json is valid towards json-schema
 		common_config.Logger.WithFields(logrus.Fields{
-			"id":                               "a61ad3b1-63db-4a0a-b39f-0526d52fbcde",
+			"id": "a61ad3b1-63db-4a0a-b39f-0526d52fbcde",
 			"supportedMetaDataJsonToValidateAsString": *supportedMetaDataJsonToValidateAsStringPtr,
 			"supportedMetaDataJsonSchemaAsString":     supportedMetaDataJsonSchemaAsString,
 		}).Debug("'supportedMetaDataJsonToValidateAsString' is valid to json-schema " +
-			"'supportedMetaDataJsonSchemaAsString'"
+			"'supportedMetaDataJsonSchemaAsString'")
 	}
 
 	return nil

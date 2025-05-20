@@ -4,12 +4,11 @@ import (
 	"context"
 	"github.com/jlambert68/FenixConnectorAdminShared/common_config"
 	"github.com/jlambert68/FenixConnectorAdminShared/gcp"
+	"github.com/jlambert68/FenixConnectorAdminShared/supportedMetaData"
 	fenixExecutionWorkerGrpcApi "github.com/jlambert68/FenixGrpcApi/FenixExecutionServer/fenixExecutionWorkerGrpcApi/go_grpc_api"
 	fenixSyncShared "github.com/jlambert68/FenixSyncShared"
 	"github.com/jlambert68/FenixTestInstructionsAdminShared/shared_code"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/encoding/protojson"
-	"strings"
 	"time"
 )
 
@@ -31,27 +30,24 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	var supportedMetaDataAsByteSlice *[]byte
 	supportedMetaDataAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedMetaData()
 
+	// Convert the '[]byte' into a 'string'
+	var supportedMetaDataAsString string
+	supportedMetaDataAsString = string(*supportedMetaDataAsByteSlice)
+
 	// Verify json towards json-schema
-	err = supportedMetaData.VerifyMetaDataAgainstJsonSchema(supportedMetaDataAsByteSlice)
-
-	// Convert into gRPC-message by looping incomming message
-	var allTemplateRepositories []*fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters
-	for messageIndex, repositoryConnectionParameters := range templateRepositoryConnectionParameters.TemplatePaths {
-
-		// Create one url to a Template repository
-		var tempAllTemplateRepositories *fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters
-		tempAllTemplateRepositories = &fenixExecutionWorkerGrpcApi.TemplateRepositoryConnectionParameters{
-			RepositoryApiUrlName: repositoryConnectionParameters.RepositoryApiUrlName,
-			RepositoryApiUrl:     repositoryConnectionParameters.RepositoryApiUrl,
-			RepositoryOwner:      repositoryConnectionParameters.RepositoryOwner,
-			RepositoryName:       repositoryConnectionParameters.RepositoryName,
-			RepositoryPath:       repositoryConnectionParameters.RepositoryPath,
-			GitHubApiKey:         common_config.GitHubApiKeys[messageIndex],
-		}
-
-		// Add it to the gRPC-message
-		allTemplateRepositories = append(allTemplateRepositories, tempAllTemplateRepositories)
+	err = supportedMetaData.ValidateSupportedMetaDataJsonTowardsJsonSchema(&supportedMetaDataAsString)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "b9427f39-8fbf-42d4-bd39-aece016e8369",
+			"err": err,
+		}).Fatalln("Couldn't sign Message")
 	}
+
+	// Calculate the hash for SupportedMetaData
+	var supportedMetaDataHash string
+	supportedMetaDataHash = fenixSyncShared.HashSingleValue(supportedMetaDataAsString)
+
+	// Convert into gRPC-message
 
 	// Add Domain-information
 	var tempClientSystemIdentificationMessage *fenixExecutionWorkerGrpcApi.ClientSystemIdentificationMessage
@@ -64,30 +60,14 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 
 	// Create and sign message
 	var messageHashToSign string
-	var hashesToHash []string
-
-	// Loop all Template-data and convert into json
-	for _, tempTemplateRepository := range allTemplateRepositories {
-		var tempTemplateRepositoryAsJson string
-		tempTemplateRepositoryAsJson = protojson.Format(tempTemplateRepository)
-
-		// Remove spaces in json
-		tempTemplateRepositoryAsJson = strings.ReplaceAll(tempTemplateRepositoryAsJson, " ", "")
-
-		// Append to slice to be hashed
-		hashesToHash = append(hashesToHash, tempTemplateRepositoryAsJson)
-
-	}
-
-	// Create a hash of the slice
-	messageHashToSign = fenixSyncShared.HashValues(hashesToHash, true)
+	messageHashToSign = supportedMetaDataHash
 
 	// Sign the message
 	var signatureToVerifyAsBase64String string
 	signatureToVerifyAsBase64String, err = shared_code.SignMessageUsingSchnorrSignature(messageHashToSign)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "c1dcbe9d-5b5b-430e-9962-55dc5f313972",
+			"ID":  "72b84919-3966-4e08-b475-0e8bedb34856",
 			"err": err,
 		}).Fatalln("Couldn't sign Message")
 	}
@@ -97,7 +77,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	publicKeyAsBase64String, err = shared_code.GeneratePublicKeyAsBase64StringFromPrivateKey()
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "fe0f9d48-5536-478f-a73f-c194faf7b0ae",
+			"ID":  "b1dccf16-a375-47a1-85d5-ab051b629b95",
 			"err": err,
 		}).Fatalln("Couldn't generate Public key from Private key Message")
 	}
@@ -105,13 +85,13 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	err = shared_code.VerifySchnorrSignature(messageHashToSign, publicKeyAsBase64String, signatureToVerifyAsBase64String)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "418c970e-6c41-4eb3-83e1-dbc5b6f0343c",
+			"ID":  "625bd417-a395-49e0-aa60-15238cd399c8",
 			"err": err,
 		}).Fatalln("Couldn't verify the Signature")
 	}
 
 	common_config.Logger.WithFields(logrus.Fields{
-		"ID":                              "4c0b1960-2f12-4fd1-ae9b-3b10f3a34764",
+		"ID":                              "cf51ff69-0d3a-4b8b-aebb-8947f5453fa7",
 		"messageHashToSign":               messageHashToSign,
 		"publicKeyAsBase64String":         publicKeyAsBase64String,
 		"signatureToVerifyAsBase64String": signatureToVerifyAsBase64String,
@@ -124,8 +104,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Create the full gRPC-message
-	var templateRepositoryConnectionParametersAsGrpc *fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters
-	templateRepositoryConnectionParametersAsGrpc = &fenixExecutionWorkerGrpcApi.AllTemplateRepositoryConnectionParameters{
+	var supportedMetaDataAsGrpc *fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData
+	supportedMetaDataAsGrpc = &fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData{
 		ClientSystemIdentification: tempClientSystemIdentificationMessage,
 		AllTemplateRepositories:    allTemplateRepositories,
 		MessageSignatureData:       messageSignatureData,
@@ -152,9 +132,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	ctx, err = toExecutionWorkerObject.SetConnectionToFenixExecutionWorkerServer(ctx)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":    "00e1967c-ee39-4f22-8e63-fb54ac97fb0a",
+			"ID":    "c28e37c3-4c09-4e9a-9a09-b1874c0b56ff",
 			"error": err,
-		}).Fatalln("Problem setting up connection to Fenix Execution Worker for 'SendTemplateRepositoryConnectionParameters'")
+		}).Fatalln("Problem setting up connection to Fenix Execution Worker for 'SendSupportedMetaData'")
 	}
 
 	// Do gRPC-call
@@ -175,9 +155,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 		ctx, returnMessageAckNack, returnMessageString = gcp.Gcp.GenerateGCPAccessToken(ctx, gcp.GenerateTokenForGrpcTowardsExecutionWorker)
 		if returnMessageAckNack == false {
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID":                  "5a4d988f-d32d-4547-9a21-76aca8eafa60",
+				"ID":                  "3d9cb846-3b12-4124-9c9d-26ce4b8545de",
 				"returnMessageString": returnMessageString,
-			}).Fatalln("Problem generating GCP access token for 'SendTemplateRepositoryConnectionParameters'")
+			}).Fatalln("Problem generating GCP access token for 'SendSupportedMetaData'")
 		}
 
 	}
@@ -200,9 +180,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	for {
 
 		returnMessage, err := fenixExecutionWorkerGrpcClient.
-			ConnectorPublishTemplateRepositoryConnectionParameters(
+			ConnectorPublishSupportedMetaData(
 				ctx,
-				templateRepositoryConnectionParametersAsGrpc)
+				supportedMetaDataAsGrpc)
 
 		// Add to counter for how many gRPC-call-attempts to Worker that have been done
 		gRPCCallAttemptCounter = gRPCCallAttemptCounter + 1
@@ -214,9 +194,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 			if gRPCCallAttemptCounter >= numberOfgRPCCallAttempts {
 
 				common_config.Logger.WithFields(logrus.Fields{
-					"ID":    "74336d26-d0ee-47b6-bc34-ff7331116953",
+					"ID":    "bdbd1322-abc7-46fd-aa21-65701d640914",
 					"error": err,
-				}).Fatalln("Problem to do gRPC-call to Fenix Execution Worker for 'SendTemplateRepositoryConnectionParameters'")
+				}).Fatalln("Problem to do gRPC-call to Fenix Execution Worker for 'SendSupportedMetaData'")
 
 			}
 
@@ -226,15 +206,15 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 		} else if returnMessage.AckNack == false {
 			// Couldn't handle gPRC call
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID":                        "49053c3b-5561-4724-a506-7f655e6b5b65",
+				"ID":                        "f6911973-74b2-470a-b914-88808d258cdc",
 				"Message from Fenix Worker": returnMessage.Comments,
-			}).Fatalln("Problem to do gRPC-call to Worker for 'SendTemplateRepositoryConnectionParameters'")
+			}).Fatalln("Problem to do gRPC-call to Worker for 'SendSupportedMetaData'")
 
 		} else {
 
 			common_config.Logger.WithFields(logrus.Fields{
-				"ID": "b7642df4-234e-497b-a725-a337582a238e",
-			}).Debug("Success in doing gRPC-call to Worker for 'SendTemplateRepositoryConnectionParameters")
+				"ID": "edec2763-8f5e-422c-a8b2-bb0d00056e84",
+			}).Debug("Success in doing gRPC-call to Worker for 'SendSupportedMetaData")
 
 			return
 

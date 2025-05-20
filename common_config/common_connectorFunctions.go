@@ -40,6 +40,10 @@ type ConnectorCallBackFunctionsStruct struct {
 	// Sends "Simple" TestData towards TestCaseBuilderServer
 	GenerateSimpleTestData func() (
 		simpleTestData []*testDataEngine.TestDataFromSimpleTestDataAreaStruct)
+
+	// Sends "Simple" TestData towards TestCaseBuilderServer
+	GenerateSupportedMetaData func() (
+		supportedMetaData *[]byte)
 }
 
 // ConnectorFunctionsToDoCallBackOn

@@ -34,7 +34,9 @@ func ValidateSupportedMetaDataJsonTowardsJsonSchema(
 	}
 
 	// Validate that the 'supportedMetaDataJson' is valid towards the json-schema
-	err = supportedMetaDataJsonSchema.Validate(*supportedMetaDataJsonToValidateAsStringPtr)
+	var supportedMetaDataJsonToValidateAsString string
+	supportedMetaDataJsonToValidateAsString = *supportedMetaDataJsonToValidateAsStringPtr
+	err = supportedMetaDataJsonSchema.Validate(supportedMetaDataJsonToValidateAsString)
 	if err != nil {
 
 		// json is not valid towards json-schema

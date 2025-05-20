@@ -38,9 +38,9 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	err = supportedMetaData.ValidateSupportedMetaDataJsonTowardsJsonSchema(&supportedMetaDataAsString)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
-			"ID":  "b9427f39-8fbf-42d4-bd39-aece016e8369",
+			"ID":  "a16a25f3-5f09-4dd3-aac8-e1971baa6413",
 			"err": err,
-		}).Fatalln("Couldn't sign Message")
+		}).Fatalln("Couldn't validate json-message using json-schema for 'SendSupportedMetaData'")
 	}
 
 	// Calculate the hash for SupportedMetaData
@@ -107,7 +107,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	var supportedMetaDataAsGrpc *fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData
 	supportedMetaDataAsGrpc = &fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData{
 		ClientSystemIdentification: tempClientSystemIdentificationMessage,
-		AllTemplateRepositories:    allTemplateRepositories,
+		SupportedMetaDataAsJson:    supportedMetaDataAsString,
 		MessageSignatureData:       messageSignatureData,
 	}
 

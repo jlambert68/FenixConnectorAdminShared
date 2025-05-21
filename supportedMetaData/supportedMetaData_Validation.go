@@ -58,12 +58,15 @@ func ValidateSupportedMetaDataJsonTowardsJsonSchema(
 
 	} else {
 		// json is valid towards json-schema
-		common_config.Logger.WithFields(logrus.Fields{
-			"id": "a61ad3b1-63db-4a0a-b39f-0526d52fbcde",
-			"string(supportedMetaDataJsonToValidateAsByteArray)": string(supportedMetaDataJsonToValidateAsByteArray),
-			"supportedMetaDataJsonSchemaAsString":                supportedMetaDataJsonSchemaAsString,
-		}).Debug("'supportedMetaDataJsonToValidateAsString' is valid to json-schema " +
-			"'supportedMetaDataJsonSchemaAsString'")
+		/*
+			common_config.Logger.WithFields(logrus.Fields{
+				"id": "a61ad3b1-63db-4a0a-b39f-0526d52fbcde",
+				"string(supportedMetaDataJsonToValidateAsByteArray)": string(supportedMetaDataJsonToValidateAsByteArray),
+				"supportedMetaDataJsonSchemaAsString":                supportedMetaDataJsonSchemaAsString,
+			}).Debug("'supportedMetaDataJsonToValidateAsString' is valid to json-schema " +
+				"'supportedMetaDataJsonSchemaAsString'")
+
+		*/
 	}
 
 	return nil

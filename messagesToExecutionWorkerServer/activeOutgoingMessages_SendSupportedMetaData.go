@@ -26,26 +26,42 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 
 	var err error
 
-	// Do call-back to get all 	MetaData that should be sent
-	var supportedMetaDataAsByteSlice *[]byte
-	supportedMetaDataAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedMetaData()
+	// Do call-back to get all, TestCase and TestSuite, MetaData that should be sent
+	var supportedTestCaseMetaDataAsByteSlice *[]byte
+	var supportedTestSuiteMetaDataAsByteSlice *[]byte
+	supportedTestCaseMetaDataAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedTestCaseMetaData()
+	supportedTestSuiteMetaDataAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedTestSuiteMetaData()
 
 	// Convert the '[]byte' into a 'string'
-	var supportedMetaDataAsString string
-	supportedMetaDataAsString = string(*supportedMetaDataAsByteSlice)
+	var supportedTestCaseMetaDataAsString string
+	var supportedTestSuiteMetaDataAsString string
+	supportedTestCaseMetaDataAsString = string(*supportedTestCaseMetaDataAsByteSlice)
+	supportedTestSuiteMetaDataAsString = string(*supportedTestSuiteMetaDataAsByteSlice)
 
-	// Verify json towards json-schema
-	err = supportedMetaData.ValidateSupportedMetaDataJsonTowardsJsonSchema(supportedMetaDataAsByteSlice)
+	// Verify json towards json-schema - TestCaseMetaData
+	err = supportedMetaData.ValidateSupportedTestCaseMetaDataJsonTowardsJsonSchema(supportedTestCaseMetaDataAsByteSlice)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
 			"ID":  "a16a25f3-5f09-4dd3-aac8-e1971baa6413",
 			"err": err,
-		}).Fatalln("Couldn't validate json-message using json-schema for 'SendSupportedMetaData'")
+		}).Fatalln("Couldn't validate json-message using json-schema for 'SendSupportedTestCaseMetaData'")
+	}
+
+	// Verify json towards json-schema - TestSuiteMetaData
+	err = supportedMetaData.ValidateSupportedTestSuiteMetaDataJsonTowardsJsonSchema(supportedTestSuiteMetaDataAsByteSlice)
+	if err != nil {
+		common_config.Logger.WithFields(logrus.Fields{
+			"ID":  "083656bb-281e-4661-a404-d8b5ae2ea8a6",
+			"err": err,
+		}).Fatalln("Couldn't validate json-message using json-schema for 'SendSupportedTestSuiteMetaData'")
 	}
 
 	// Calculate the hash for SupportedMetaData
 	var supportedMetaDataHash string
-	supportedMetaDataHash = fenixSyncShared.HashSingleValue(supportedMetaDataAsString)
+	var metaDataToBeHashed []string
+	metaDataToBeHashed = append(metaDataToBeHashed, supportedTestCaseMetaDataAsString)
+	metaDataToBeHashed = append(metaDataToBeHashed, supportedTestSuiteMetaDataAsString)
+	supportedMetaDataHash = fenixSyncShared.HashValues(metaDataToBeHashed, true)
 
 	// Convert into gRPC-message
 
@@ -106,9 +122,10 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	// Create the full gRPC-message
 	var supportedMetaDataAsGrpc *fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData
 	supportedMetaDataAsGrpc = &fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData{
-		ClientSystemIdentification: tempClientSystemIdentificationMessage,
-		SupportedMetaDataAsJson:    supportedMetaDataAsString,
-		MessageSignatureData:       messageSignatureData,
+		ClientSystemIdentification:       tempClientSystemIdentificationMessage,
+		SupportedTestCaseMetaDataAsJson:  supportedTestCaseMetaDataAsString,
+		SupportedTestSuiteMetaDataAsJson: supportedTestSuiteMetaDataAsString,
+		MessageSignatureData:             messageSignatureData,
 	}
 
 	// Check if this Connector is the one that sends Supported TestInstructions, TesInstructionContainers,

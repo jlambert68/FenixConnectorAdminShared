@@ -105,7 +105,7 @@ func fenixExecutionConnectorMain() {
 		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 			SendSimpleTestData()
 
-		// Send SupportTestCaseMetaData to worker
+		// Send SupportTestCaseMetaData and SupportTestSuiteMetaData to worker
 		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 			SendSupportedMetaData()
 

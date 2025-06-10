@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "MetaDataGroups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "MetaDataGroupName": {
+            "type": "string"
+          },
+          "MetaDataInGroup": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "MetaDataName": {
+                  "type": "string"
+                },
+                "SelectType": {
+                  "type": "string",
+                  "enum": ["SingleSelect", "MultiSelect"]
+                },
+                "Mandatory": {
+                  "type": "string",
+                  "enum": ["True", "False"]
+                },
+                "MetaDataValues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "MetaDataName",
+                "SelectType",
+                "Mandatory",
+                "MetaDataValues"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "MetaDataGroupName",
+          "MetaDataInGroup"
+        ],
+        "additionalProperties": false
+      },
+      "contains": {
+        "type": "object",
+        "properties": {
+          "MetaDataGroupName": {
+            "const": "TestSuite"
+          },
+          "MetaDataInGroup": {
+            "type": "array",
+            "contains": {
+              "type": "object",
+              "properties": {
+                "MetaDataName":   { "const": "Status" },
+                "SelectType":     { "const": "SingleSelect" },
+                "Mandatory":      { "const": "True" },
+                "MetaDataValues": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "Blocked",
+                      "Draft",
+                      "Ready for Test"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "MetaDataName",
+                "SelectType",
+                "Mandatory",
+                "MetaDataValues"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "MetaDataGroupName",
+          "MetaDataInGroup"
+        ]
+      }
+    }
+  },
+  "required": ["MetaDataGroups"],
+  "additionalProperties": false
+}

@@ -120,8 +120,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Create the full gRPC-message
-	var supportedMetaDataAsGrpc *fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData
-	supportedMetaDataAsGrpc = &fenixExecutionWorkerGrpcApi.SupportedTestCaseMetaData{
+	var supportedMetaDataAsGrpc *fenixExecutionWorkerGrpcApi.SupportedTestCaseAndTestSuiteMetaData
+	supportedMetaDataAsGrpc = &fenixExecutionWorkerGrpcApi.SupportedTestCaseAndTestSuiteMetaData{
 		ClientSystemIdentification:       tempClientSystemIdentificationMessage,
 		SupportedTestCaseMetaDataAsJson:  supportedTestCaseMetaDataAsString,
 		SupportedTestSuiteMetaDataAsJson: supportedTestSuiteMetaDataAsString,

@@ -48,6 +48,14 @@ type ConnectorCallBackFunctionsStruct struct {
 	// Sends TestSuiteMetaData towards TestCaseBuilderServer
 	GenerateSupportedTestSuiteMetaData func() (
 		supportedTestSuiteMetaData *[]byte)
+
+	// Sends SubInstructions towards TestCaseBuilderServer
+	GenerateSupportedSubInstructions func() (
+		supportedSubInstructions *[]byte)
+
+	// Sends SubInstructionsPerTestInstructions towards TestCaseBuilderServer
+	GenerateSupportedSubInstructionsPerTestInstruction func() (
+		supportedSubInstructionsPerTestInstruction *[][]byte)
 }
 
 // ConnectorFunctionsToDoCallBackOn

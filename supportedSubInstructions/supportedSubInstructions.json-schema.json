@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SupportedSubInstructions json-schema",
+  "type": "object",
+  "properties": {
+    "SupportedSubInstructions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Class": {
+            "type": "string"
+          },
+          "Method": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Class",
+          "Method"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "SupportedSubInstructions"
+  ],
+  "additionalProperties": false
+}

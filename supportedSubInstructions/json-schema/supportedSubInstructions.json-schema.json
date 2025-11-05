@@ -13,11 +13,36 @@
           },
           "Method": {
             "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "PreConditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Class": {
+                  "type": "string"
+                },
+                "Method": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "Class",
+                "Method"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
           }
         },
         "required": [
           "Class",
-          "Method"
+          "Method",
+          "Description",
+          "PreConditions"
         ],
         "additionalProperties": false
       },

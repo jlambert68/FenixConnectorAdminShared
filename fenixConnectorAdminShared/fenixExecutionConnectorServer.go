@@ -109,6 +109,10 @@ func fenixExecutionConnectorMain() {
 		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
 			SendSupportedMetaData()
 
+		// Send SupportSubInstructions and SupportedSubInstructionsPerTestInstruction
+		fenixConnectorAdminSharedObject.TestInstructionExecutionEngine.MessagesToExecutionWorkerObjectReference.
+			SendSupportedSubInstructions()
+
 		// Should there be any communication out from Connector
 		if common_config.TurnOffAllCommunicationWithWorker == false {
 

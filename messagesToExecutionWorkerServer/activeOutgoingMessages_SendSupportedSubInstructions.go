@@ -28,17 +28,17 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 
 	// Do call-back to get all, TestCase and TestSuite, MetaData that should be sent
 	var supportedSubInstructionsAsByteSlice *[]byte
-	var supportedSubInstructionsPerTestInstructioAsByteSlice *[][]byte
+	var supportedSubInstructionsPerTestInstructionAsByteSlice *[][]byte
 	supportedSubInstructionsAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedSubInstructions()
-	supportedSubInstructionsPerTestInstructioAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedSubInstructionsPerTestInstruction()
+	supportedSubInstructionsPerTestInstructionAsByteSlice = common_config.ConnectorFunctionsToDoCallBackOn.GenerateSupportedSubInstructionsPerTestInstruction()
 
 	// Convert the '[]byte' into a 'string'
 	var supportedSubInstructionsAsString string
-	var supportedSubInstructionsPerTestIntructionAsStringSlice []string
+	var supportedSubInstructionsPerTestInstructionAsStringSlice []string
 	supportedSubInstructionsAsString = string(*supportedSubInstructionsAsByteSlice)
-	for _, tempSupportedSubInstructionsPerTestInstructioAsByteSlice := range *supportedSubInstructionsPerTestInstructioAsByteSlice {
-		supportedSubInstructionsPerTestIntructionAsStringSlice = append(
-			supportedSubInstructionsPerTestIntructionAsStringSlice, string(tempSupportedSubInstructionsPerTestInstructioAsByteSlice))
+	for _, tempSupportedSubInstructionsPerTestInstructionAsByteSlice := range *supportedSubInstructionsPerTestInstructionAsByteSlice {
+		supportedSubInstructionsPerTestInstructionAsStringSlice = append(
+			supportedSubInstructionsPerTestInstructionAsStringSlice, string(tempSupportedSubInstructionsPerTestInstructionAsByteSlice))
 	}
 
 	// Verify json towards json-schema - SupportedSubInstructions
@@ -51,7 +51,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Verify json towards json-schema - TestSuiteMetaData
-	err = supportedSubInstructions.ValidateSupportedSubInstructionsPerTestInstructionJsonTowardsJsonSchema(supportedSubInstructionsPerTestInstructioAsByteSlice)
+	err = supportedSubInstructions.ValidateSupportedSubInstructionsPerTestInstructionJsonTowardsJsonSchema(supportedSubInstructionsPerTestInstructionAsByteSlice)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
 			"ID":  "13124d05-dc67-407a-a9cd-40f0fa41758d",
@@ -60,11 +60,11 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Calculate the hash for SupportedSubInstructions
-	var supportedSubInstructionsaHash string
+	var supportedSubInstructionsHash string
 	var subInstructionsToBeHashed []string
 	subInstructionsToBeHashed = append(subInstructionsToBeHashed, supportedSubInstructionsAsString)
-	subInstructionsToBeHashed = append(subInstructionsToBeHashed, supportedSubInstructionsPerTestIntructionAsStringSlice...)
-	supportedSubInstructionsaHash = fenixSyncShared.HashValues(subInstructionsToBeHashed, true)
+	subInstructionsToBeHashed = append(subInstructionsToBeHashed, supportedSubInstructionsPerTestInstructionAsStringSlice...)
+	supportedSubInstructionsHash = fenixSyncShared.HashValues(subInstructionsToBeHashed, true)
 
 	// Convert into gRPC-message
 
@@ -79,7 +79,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 
 	// Create and sign message
 	var messageHashToSign string
-	messageHashToSign = supportedSubInstructionsaHash
+	messageHashToSign = supportedSubInstructionsHash
 
 	// Sign the message
 	var signatureToVerifyAsBase64String string
@@ -127,7 +127,7 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	supportedSubInstructionsAsGrpc = &fenixExecutionWorkerGrpcApi.SupportedSubInstructions{
 		ClientSystemIdentification:                       tempClientSystemIdentificationMessage,
 		SupportedSubInstructionsAsJson:                   supportedSubInstructionsAsString,
-		SupportedSubInstructionsPerTestInstructionAsJson: supportedSubInstructionsPerTestIntructionAsStringSlice,
+		SupportedSubInstructionsPerTestInstructionAsJson: supportedSubInstructionsPerTestInstructionAsStringSlice,
 		MessageSignatureData:                             messageSignatureData,
 	}
 

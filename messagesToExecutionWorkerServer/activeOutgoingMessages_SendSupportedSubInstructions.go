@@ -50,8 +50,8 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 		}).Fatalln("Error when validation 'SendSupportedSubInstructions'")
 	}
 
-	// Verify json towards json-schema - TestSuiteMetaData
-	err = supportedSubInstructions.ValidateSupportedSubInstructionsPerTestInstructionJsonTowardsJsonSchema(supportedSubInstructionsPerTestInstructionAsByteSlice)
+	// Verify json towards json-schema - SubInstructionsPerTestInstruction
+	err = supportedSubInstructions.ValidateSupportedSubInstructionsPerTestInstruction(supportedSubInstructionsPerTestInstructionAsByteSlice)
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
 			"ID":  "13124d05-dc67-407a-a9cd-40f0fa41758d",

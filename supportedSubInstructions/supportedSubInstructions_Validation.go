@@ -35,7 +35,9 @@ func ValidateSupportedSubInstructions(
 
 // ValidatePreConditionsForSupportedSubInstructionsJson
 // Validates that the PreConditions aren't broken for SupportedSubInstructions-json
-func validatePreConditionsForSupportedSubInstructionsJson(supportedSubInstructionsJsonToValidateAsByteArrayPtr *[]byte) (err error) {
+func validatePreConditionsForSupportedSubInstructionsJson(
+	supportedSubInstructionsJsonToValidateAsByteArrayPtr *[]byte) (
+	err error) {
 
 	var doc SupportedSubInstructionsDocument
 	if err = json.Unmarshal(*supportedSubInstructionsJsonToValidateAsByteArrayPtr, &doc); err != nil {

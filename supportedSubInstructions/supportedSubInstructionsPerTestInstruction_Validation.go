@@ -182,8 +182,6 @@ func validateExecutionOrderTowardsPreConditionsForSupportedSubInstructionsPerTes
 
 		return err
 
-		return err
-
 	}
 
 	return err

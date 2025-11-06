@@ -51,7 +51,10 @@ func (toExecutionWorkerObject *MessagesToExecutionWorkerObjectStruct) SendSuppor
 	}
 
 	// Verify json towards json-schema - SubInstructionsPerTestInstruction
-	err = supportedSubInstructions.ValidateSupportedSubInstructionsPerTestInstruction(supportedSubInstructionsPerTestInstructionAsByteSlice)
+	err = supportedSubInstructions.ValidateSupportedSubInstructionsPerTestInstruction(
+		supportedSubInstructionsAsByteSlice,
+		supportedSubInstructionsPerTestInstructionAsByteSlice)
+
 	if err != nil {
 		common_config.Logger.WithFields(logrus.Fields{
 			"ID":  "13124d05-dc67-407a-a9cd-40f0fa41758d",

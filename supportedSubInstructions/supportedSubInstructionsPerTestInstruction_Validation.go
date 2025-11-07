@@ -171,16 +171,16 @@ func validateExecutionOrderTowardsPreConditionsForSupportedSubInstructionsPerTes
 		// --- Print results ---
 		if !result.OK {
 
+			common_config.Logger.WithFields(logrus.Fields{
+				"id":  "8e6454cd-bb7c-4252-897f-e7291048c037",
+				"err": result.Errors,
+				"tempSupportedSubInstructionsPerTestInstructionToValidated": string(tempSupportedSubInstructionsPerTestInstructionToValidated),
+			}).Error("Failed when validating ExecutionOrder")
+
+			err = errors.New("failed when validating PreConditions")
+
+			return err
 		}
-		common_config.Logger.WithFields(logrus.Fields{
-			"id":  "8e6454cd-bb7c-4252-897f-e7291048c037",
-			"err": result.Errors,
-			"tempSupportedSubInstructionsPerTestInstructionToValidated": string(tempSupportedSubInstructionsPerTestInstructionToValidated),
-		}).Error("Failed when validating ExecutionOrder")
-
-		err = errors.New("failed when validating PreConditions")
-
-		return err
 
 	}
 

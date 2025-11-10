@@ -14,6 +14,9 @@
           "Method": {
             "type": "string"
           },
+          "Execute": {
+            "type": "boolean"
+          },
           "Description": {
             "type": "string"
           },
@@ -27,11 +30,15 @@
                 },
                 "Method": {
                   "type": "string"
+                },
+                "Execute": {
+                  "type": "boolean"
                 }
               },
               "required": [
                 "Class",
-                "Method"
+                "Method",
+                "Execute"
               ],
               "additionalProperties": false
             },
@@ -41,6 +48,7 @@
         "required": [
           "Class",
           "Method",
+          "Execute",
           "Description",
           "PreConditions"
         ],

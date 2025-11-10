@@ -31,9 +31,10 @@
       "type": "object",
       "properties": {
         "Class": { "type": "string" },
-        "Method": { "type": "string" }
+        "Method": { "type": "string" },
+        "Execute": { "type": "boolean" }
       },
-      "required": ["Class", "Method"],
+      "required": ["Class", "Method", "Execute"],
       "additionalProperties": false
     },
 

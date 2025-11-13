@@ -17,6 +17,9 @@
           "Execute": {
             "type": "boolean"
           },
+          "UseFullTimeOutTime": {
+            "type": "boolean"
+          },
           "Description": {
             "type": "string"
           },
@@ -49,6 +52,7 @@
           "Class",
           "Method",
           "Execute",
+          "UseFullTimeOutTime",
           "Description",
           "PreConditions"
         ],
